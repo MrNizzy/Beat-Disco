@@ -263,14 +263,25 @@ export default function SongEditorModal({
       onPointerUp={handlePointerUp}
       onClick={(e) => { if (e.target === e.currentTarget) handleClose() }}
     >
-      <div className={`relative w-full max-w-5xl  border border-white/10 bg-[#0a0a1a] p-8 shadow-2xl max-h-[90vh] overflow-y-auto transition-all duration-200 ${closing ? 'scale-95 opacity-0' : 'scale-100 opacity-100'}`}>
-        <button
-          onClick={handleClose}
-          className="absolute right-4 top-4 cursor-pointer text-text-muted transition-colors hover:text-white"
-          aria-label="Cerrar"
-        >
-          <Icon icon="tabler:x" className="w-6 h-6" />
-        </button>
+      <BorderGlow
+        colors={['#ff2d95', '#00f0ff', '#b300ff']}
+        glowColor="330 100 60"
+        backgroundColor="#0a0a1a"
+        borderRadius={0}
+        edgeSensitivity={30}
+        animated={true}
+        glowIntensity={1.0}
+        fillOpacity={0.5}
+        className={`w-full max-w-5xl max-h-[90vh] overflow-y-auto transition-all duration-200 ${closing ? 'scale-95 opacity-0' : 'scale-100 opacity-100'}`}
+      >
+        <div className="relative p-8">
+          <button
+            onClick={handleClose}
+            className="absolute right-0 top-0 cursor-pointer text-text-muted transition-colors hover:text-white"
+            aria-label="Cerrar"
+          >
+            <Icon icon="tabler:x" className="w-6 h-6" />
+          </button>
 
         <div className="mb-6 flex gap-5">
           <div className="flex-1">
@@ -413,23 +424,12 @@ export default function SongEditorModal({
         </div>
 
         <div className="mb-5 space-y-3">
-          <BorderGlow
-            colors={['#ff2d95', '#00f0ff', '#b300ff']}
-            glowColor="330 100 60"
-            backgroundColor="#050505"
-            borderRadius={0}
-            edgeSensitivity={30}
-            animated={true}
-            glowIntensity={1.0}
-            fillOpacity={0.5}
+          <button
+            onClick={() => (playing ? onStop() : onPlay())}
+            className="btn-primary w-full px-8 py-3 text-lg font-bold uppercase tracking-wider"
           >
-            <button
-              onClick={() => (playing ? onStop() : onPlay())}
-              className="btn-primary w-full px-8 py-3 text-lg font-bold uppercase tracking-wider"
-            >
-              <Icon icon={playing ? 'tabler:player-stop-filled' : 'tabler:player-play-filled'} className="w-6 h-6" />
-            </button>
-          </BorderGlow>
+            <Icon icon={playing ? 'tabler:player-stop-filled' : 'tabler:player-play-filled'} className="w-6 h-6" />
+          </button>
 
           <div className="grid grid-cols-[1.5rem_1fr_90px] sm:grid-cols-[1.5rem_1fr_90px_1.5rem_1fr_90px] gap-x-2.5 gap-y-3 sm:gap-y-0 items-center">
             <Icon icon="tabler:volume" className="w-5 h-5 text-text-muted justify-self-center" />
@@ -479,44 +479,23 @@ export default function SongEditorModal({
         </div>
 
         <div className="flex items-center justify-between border-t border-white/5 pt-4">
-          <BorderGlow
-            colors={['#00f0ff', '#ff2d95', '#b300ff']}
-            glowColor="190 100 50"
-            backgroundColor="#050505"
-            borderRadius={0}
-            edgeSensitivity={30}
-            animated={true}
-            glowIntensity={1.0}
-            fillOpacity={0.5}
+          <button
+            onClick={handleReset}
+            className="cursor-pointer flex items-center gap-1.5  border border-white/10 bg-black/40 px-6 py-3 text-base font-bold uppercase tracking-wider text-text-muted transition-all hover:border-neon-cyan/30 hover:text-neon-cyan"
           >
-            <button
-              onClick={handleReset}
-              className="cursor-pointer flex items-center gap-1.5  border border-white/10 bg-black/40 px-6 py-3 text-base font-bold uppercase tracking-wider text-text-muted transition-all hover:border-neon-cyan/30 hover:text-neon-cyan"
-            >
-              <Icon icon="tabler:refresh" className="w-5 h-5" />
-              Reset
-            </button>
-          </BorderGlow>
-          <BorderGlow
-            colors={['#ff2d95', '#00f0ff', '#b300ff']}
-            glowColor="330 100 60"
-            backgroundColor="#050505"
-            borderRadius={0}
-            edgeSensitivity={30}
-            animated={true}
-            glowIntensity={1.0}
-            fillOpacity={0.5}
+            <Icon icon="tabler:refresh" className="w-5 h-5" />
+            Reset
+          </button>
+          <button
+            onClick={handleDone}
+            className="btn-primary  px-8 py-3 text-base font-bold uppercase tracking-wider"
           >
-            <button
-              onClick={handleDone}
-              className="btn-primary  px-8 py-3 text-base font-bold uppercase tracking-wider"
-            >
-              <Icon icon="tabler:check" className="w-6 h-6" />
-              Done
-            </button>
-          </BorderGlow>
+            <Icon icon="tabler:check" className="w-6 h-6" />
+            Done
+          </button>
+          </div>
         </div>
-      </div>
+      </BorderGlow>
     </div>
   )
 }
