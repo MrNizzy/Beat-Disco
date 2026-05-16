@@ -14,6 +14,7 @@ import BeatPulse from './components/BeatPulse'
 import SongWaveform from './components/SongWaveform'
 import SongEditorModal from './components/SongEditorModal'
 import type { EditorSnapshot } from './components/SongEditorModal'
+import ElectricBorder from './components/ElectricBorder'
 import { useVolumeStore } from './lib/store/useVolumeStore'
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
   const [editableOffset, setEditableOffset] = useState(0)
   const [editableTitle, setEditableTitle] = useState('')
   const [editableArtist, setEditableArtist] = useState('')
+  const [muted, setMuted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [exporting, setExporting] = useState(false)
   const [error, setError] = useState('')
@@ -43,13 +45,13 @@ function App() {
     audioFile?.audioBuffer ?? null,
     selectedBpmOption,
     editableOffset,
-    volume,
+    muted ? 0 : volume,
     metronomeVolume,
     trimStartMs,
     trimEndMs,
   )
 
-  function handleNewSong() {
+  function goHome() {
     player.stop()
     setAudioFile(null)
     setAnalysis(null)
@@ -62,6 +64,11 @@ function App() {
     setTrimEndMs(0)
     setEditorOpen(false)
     setSnapshot(null)
+  }
+
+  function handleNewSong() {
+    goHome()
+    inputRef.current?.click()
   }
 
   async function handleFile(file: File) {
@@ -188,268 +195,269 @@ function App() {
       <ParticlesBackground playing={player.playing} beatPhaseRef={player.beatPhaseRef} metronomeEnabled={player.metronomeEnabled} />
       <EdgeWaves analyserRef={player.analyserRef} playing={player.playing} />
       <BeatPulse beatPhaseRef={player.beatPhaseRef} playing={player.playing} />
+      <div
+        className="fixed inset-0 z-[-1] pointer-events-none select-none"
+        style={{
+          backgroundImage: 'url(/charlie)',
+          backgroundPosition: 'left bottom',
+          backgroundSize: 'auto 80%',
+          backgroundRepeat: 'no-repeat',
+        }}
+        aria-hidden="true"
+      />
 
       {dragOver && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-          <div className="flex flex-col items-center gap-4 rounded-2xl border-2 border-dashed border-neon-cyan/60 px-12 py-16">
+          <div className="flex flex-col items-center gap-4  border-2 border-dashed border-neon-cyan/60 px-12 py-16">
             <Icon icon="tabler:music" className="w-14 h-14 text-neon-cyan drop-shadow-[0_0_20px_rgba(0,240,255,0.6)]" />
-            <p className="font-disco text-2xl font-bold uppercase tracking-wider text-neon-cyan drop-shadow-[0_0_10px_rgba(0,240,255,0.4)]">
+            <p className="font-body text-2xl font-bold uppercase tracking-wider text-neon-cyan drop-shadow-[0_0_10px_rgba(0,240,255,0.4)]">
               Suelta para cargar
             </p>
           </div>
         </div>
       )}
 
-      <main className="relative z-10 mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
+      <input
+        ref={inputRef}
+        type="file"
+        accept="audio/*"
+        hidden
+        onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+      />
+
+      <main className="relative z-10 mx-auto max-w-[90dvw] px-4 py-8 sm:px-6 sm:py-12">
         <header className={`text-center ${audioFile ? 'mb-8' : ''}`}>
-          <h1 className="font-disco text-4xl font-bold uppercase tracking-wider text-white sm:text-5xl neon-text">
+          <h1 onClick={goHome} className="font-disco text-5xl font-bold uppercase tracking-wider text-white sm:text-7xl neon-text cursor-pointer select-none" style={{ fontFamily: 'XXIX, sans-serif' }}>
             Beat Disco
           </h1>
-          <p className="mt-2 text-sm text-neon-cyan sm:text-base">
+          <p className="mt-2 text-base text-neon-cyan sm:text-lg">
             Audio Toolkit for Dead As Disco
           </p>
         </header>
 
         {!audioFile ? (
-          <div className="flex items-center justify-center min-h-[55vh] sm:min-h-[60vh]">
+          <section className="flex items-center justify-center min-h-[55vh] sm:min-h-[60vh]">
             <div
               onClick={() => inputRef.current?.click()}
-              className="group w-full cursor-pointer rounded-xl border-2 border-dashed border-neon-pink/30 bg-surface/60 p-10 text-center backdrop-blur-sm transition-all duration-300 hover:border-neon-pink/70 hover:bg-surface hover:neon-glow-pink sm:p-14"
+              className="group w-full cursor-pointer  border-2 border-dashed border-neon-pink/30 bg-surface/60 p-12 text-center backdrop-blur-sm transition-all duration-300 hover:border-neon-pink/70 hover:bg-surface hover:neon-glow-pink sm:p-16"
             >
-              <input
-                ref={inputRef}
-                type="file"
-                accept="audio/*"
-                hidden
-                onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
-              />
-              <div className="mb-4 text-neon-pink/50 transition-colors group-hover:text-neon-pink/80">
-                <Icon icon="tabler:music" className="w-10 h-10 sm:w-12 sm:h-12" />
+              <div className="mb-4 flex justify-center text-neon-pink/50 transition-colors group-hover:text-neon-pink/80">
+                <Icon icon="tabler:music" className="w-14 h-14 sm:w-16 sm:h-16" />
               </div>
               {loading ? (
                 <div className="flex flex-col items-center gap-3">
-                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-neon-cyan border-t-transparent" />
-                  <p className="text-sm text-text-secondary">Analizando audio...</p>
+                  <div className="h-10 w-10 animate-spin rounded-full border-2 border-neon-cyan border-t-transparent" />
+                  <p className="text-base text-text-secondary">Analizando audio...</p>
                 </div>
               ) : (
                 <>
                   <p className="text-base font-semibold text-text-primary sm:text-lg">
                     Haz clic o arrastra un archivo de audio
                   </p>
-                  <p className="mt-1.5 text-xs text-text-muted">MP3 &middot; WAV &middot; FLAC &middot; OGG &middot; M4A</p>
+                  <p className="mt-3 text-sm text-text-muted"><span className="text-neon-pink">•</span> MP3  <span className="text-neon-pink">•</span> WAV  <span className="text-neon-pink">•</span> FLAC  <span className="text-neon-pink">•</span> OGG  <span className="text-neon-pink">•</span> M4A</p>
                 </>
               )}
             </div>
-          </div>
+          </section>
         ) : (
-          <div className="flex flex-col gap-4">
+          <section className="flex flex-col gap-4">
             <div className="flex justify-center">
-              <button
-                onClick={handleNewSong}
-                className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg border border-white/5 bg-black/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-text-secondary transition-all hover:border-neon-cyan/30 hover:text-neon-cyan"
-              >
-                <Icon icon="tabler:music-plus" className="w-4 h-4" />
-                Nueva canción
-              </button>
+              <ElectricBorder color="#00f0ff" chaos={0.08}>
+                <button
+                  onClick={handleNewSong}
+                  className="cursor-pointer inline-flex items-center gap-1.5  border border-white/5 bg-black/40 px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-text-secondary transition-all hover:border-neon-cyan/30 hover:text-neon-cyan"
+                >
+                  <Icon icon="tabler:music-plus" className="w-5 h-5" />
+                  Nueva canción
+                </button>
+              </ElectricBorder>
             </div>
 
             {error && (
-              <p className="animate-fade-in rounded-lg bg-red-900/30 px-4 py-3 text-sm text-red-400">
+              <p className="animate-fade-in  bg-red-900/30 px-4 py-3 text-base text-red-400">
                 {error}
               </p>
             )}
 
             {analysis && audioFile && (
-              <div className="animate-fade-in rounded-xl border border-white/5 bg-surface/80 p-5 text-center backdrop-blur-sm sm:p-6">
-                <div className="space-y-6">
+              <article className="animate-fade-in  border border-white/5 bg-surface/80 backdrop-blur-sm overflow-hidden">
+                <div className="h-[3px] bg-gradient-to-r from-neon-pink via-neon-purple to-neon-cyan" />
+                <div className="p-8 sm:p-10 space-y-6">
                   <div>
-                    <h2 className="font-disco text-lg uppercase tracking-wider text-neon-cyan sm:text-xl">
-                      Resultados
-                    </h2>
-                    <p className="mt-1 text-xs text-text-muted sm:text-sm">
+                    <div className="flex gap-3">
+                      <div className="flex-1 text-left">
+                        <label className="mb-1.5 block text-base font-semibold uppercase tracking-wider text-neon-cyan">
+                          Título
+                        </label>
+                        <input
+                          type="text"
+                          value={editableTitle}
+                          onChange={(e) => setEditableTitle(e.target.value)}
+                          className="w-full  border border-white/5 bg-black px-5 py-3.5 text-lg text-text-primary outline-none transition-all focus:border-neon-pink/50 focus:ring-1 focus:ring-neon-pink/30"
+                        />
+                      </div>
+                      <div className="flex-1 text-left">
+                        <label className="mb-1.5 block text-base font-semibold uppercase tracking-wider text-neon-cyan">
+                          Artista
+                        </label>
+                        <input
+                          type="text"
+                          value={editableArtist}
+                          onChange={(e) => setEditableArtist(e.target.value)}
+                          className="w-full  border border-white/5 bg-black px-5 py-3.5 text-lg text-text-primary outline-none transition-all focus:border-neon-pink/50 focus:ring-1 focus:ring-neon-pink/30"
+                        />
+                      </div>
+                    </div>
+                    <p className="mt-2 text-sm text-text-muted">
                       {audioFile.audioBuffer.duration.toFixed(1)}s &middot; {audioFile.audioBuffer.sampleRate}Hz &middot;{' '}
                       {audioFile.audioBuffer.numberOfChannels} canales
                     </p>
                   </div>
 
-                  <div className="mx-auto flex max-w-md flex-col gap-4">
-                    <div className="text-left">
-                      <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-neon-cyan">
-                        Título
-                      </label>
-                      <input
-                        type="text"
-                        value={editableTitle}
-                        onChange={(e) => setEditableTitle(e.target.value)}
-                        className="w-full rounded-lg border border-white/5 bg-black px-3 py-2 text-sm text-text-primary outline-none transition-all focus:border-neon-pink/50 focus:ring-1 focus:ring-neon-pink/30"
+                  <div className="md:grid md:grid-cols-2 md:gap-6">
+                    <section className="space-y-5">
+                      <SongWaveform
+                        audioBuffer={audioFile.audioBuffer}
+                        currentTimeRef={player.currentTimeRef}
+                        duration={player.duration}
+                        playing={player.playing}
+                        onSeek={player.seek}
                       />
-                    </div>
-                    <div className="text-left">
-                      <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-neon-cyan">
-                        Artista
-                      </label>
-                      <input
-                        type="text"
-                        value={editableArtist}
-                        onChange={(e) => setEditableArtist(e.target.value)}
-                        className="w-full rounded-lg border border-white/5 bg-black px-3 py-2 text-sm text-text-primary outline-none transition-all focus:border-neon-pink/50 focus:ring-1 focus:ring-neon-pink/30"
-                      />
-                    </div>
-                  </div>
 
-                  <div className="mx-auto max-w-md text-left">
-                    <label className="mb-3 block text-xs font-semibold uppercase tracking-wider text-neon-cyan">
-                      Velocidad (BPM)
-                    </label>
-                    <div className="space-y-2">
-                      {analysis.bpmOptions.map((opt) => {
-                        const selected = selectedBpmOption === opt.bpm
-                        return (
+                      <div className="text-left">
+                        <label className="mb-1.5 block text-base font-semibold uppercase tracking-wider text-neon-cyan">
+                          Velocidad (BPM)
+                        </label>
+                        <div className="flex flex-wrap gap-2">
+                          {analysis.bpmOptions.map((opt) => {
+                            const selected = selectedBpmOption === opt.bpm
+                            return (
+                              <button
+                                key={opt.bpm}
+                                type="button"
+                                onClick={() => {
+                                  setSelectedBpmOption(opt.bpm)
+                                  if (player.playing) player.stop()
+                                }}
+                                className={`cursor-pointer  border px-5 py-2.5 font-body text-lg font-bold transition-all ${
+                                  selected
+                                    ? 'border-neon-pink/60 bg-neon-pink/15 text-neon-pink neon-glow-pink'
+                                    : 'border-white/5 bg-black/40 text-text-secondary hover:border-neon-pink/30 hover:text-text-primary'
+                                }`}
+                              >
+                                {opt.bpm}
+                                {opt.recommended && <span className="ml-1 text-neon-gold drop-shadow-[0_0_4px_rgba(255,215,0,0.5)]">★</span>}
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    </section>
+
+                    <aside className="space-y-5 mt-6 md:mt-0 bg-black/30 p-6">
+                      <div className="text-left">
+                        <label className="mb-1.5 block text-base font-semibold uppercase tracking-wider text-neon-cyan">
+                          Beat Offset (ms)
+                        </label>
+                        <input
+                          type="number"
+                          value={editableOffset}
+                          onChange={(e) => {
+                            setEditableOffset(Number(e.target.value))
+                            if (player.playing) player.stop()
+                          }}
+                          className="w-full  border border-white/5 bg-black px-5 py-3.5 text-lg text-text-primary outline-none transition-all focus:border-neon-cyan/50 focus:ring-1 focus:ring-neon-cyan/30"
+                        />
+                        <p className="mt-1 text-sm text-text-muted">
+                          El offset no cambia entre opciones de BPM
+                        </p>
+                      </div>
+
+                      <ElectricBorder color="#ff2d95">
+                        <button
+                          onClick={() => player.playing ? player.stop() : player.play()}
+                          className="btn-primary w-full  px-10 py-4 text-lg font-bold uppercase tracking-wider"
+                        >
+                          <Icon icon={player.playing ? 'tabler:player-stop-filled' : 'tabler:player-play-filled'} className="w-6 h-6" />
+                          {player.playing ? 'Detener' : 'Reproducir'}
+                        </button>
+                      </ElectricBorder>
+
+                      <div className="grid grid-cols-[1.5rem_1fr_90px] gap-x-2.5 gap-y-3 items-center">
+                        <Icon icon="tabler:volume" className="w-5 h-5 text-text-muted justify-self-center" />
+                        <input
+                          type="range"
+                          min={0}
+                          max={1}
+                          step={0.05}
+                          value={volume}
+                          onChange={(e) => setVolume(Number(e.target.value))}
+                          className="range-neon w-full"
+                        />
+                        <button
+                          onClick={() => player.setMetronomeEnabled(!player.metronomeEnabled)}
+                          className={`cursor-pointer flex items-center gap-1.5 border px-4 py-2.5 text-sm font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-200 justify-center ${
+                            player.metronomeEnabled
+                              ? 'border-neon-cyan/50 bg-neon-cyan/12 text-neon-cyan hover:bg-neon-cyan/20'
+                              : 'border-white/10 bg-white/5 text-text-muted hover:border-text-muted/30'
+                          }`}
+                        >
+                          <Icon icon={player.metronomeEnabled ? 'tabler:speakerphone' : 'tabler:headphones-off'} className="w-5 h-5" />
+                          Beat
+                        </button>
+
+                        <Icon icon="tabler:wave-sine" className="w-5 h-5 text-text-muted justify-self-center" />
+                        <input
+                          type="range"
+                          min={0}
+                          max={1}
+                          step={0.05}
+                          value={metronomeVolume}
+                          onChange={(e) => setMetronomeVolume(Number(e.target.value))}
+                          className="range-neon w-full"
+                        />
+                        <button
+                          onClick={() => setMuted(!muted)}
+                          className={`cursor-pointer flex items-center gap-1.5 border px-4 py-2.5 text-sm font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-200 justify-center ${
+                            !muted
+                              ? 'border-neon-cyan/50 bg-neon-cyan/12 text-neon-cyan hover:bg-neon-cyan/20'
+                              : 'border-white/10 bg-white/5 text-text-muted hover:border-text-muted/30'
+                          }`}
+                        >
+                          <Icon icon={muted ? 'tabler:music-off' : 'tabler:music'} className="w-5 h-5" />
+                          Song
+                        </button>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setEditorOpen(true)}
+                          className="cursor-pointer inline-flex items-center justify-center gap-1.5 flex-1  border border-white/5 bg-black/40 px-6 py-3 text-base font-bold uppercase tracking-wider text-text-secondary transition-all hover:border-neon-cyan/30 hover:text-neon-cyan"
+                        >
+                          <Icon icon="tabler:edit" className="w-5 h-5" />
+                          Editar
+                        </button>
+                        <ElectricBorder color="#00f0ff" chaos={0.08}>
                           <button
-                            key={opt.bpm}
-                            type="button"
-                            onClick={() => {
-                              setSelectedBpmOption(opt.bpm)
-                              if (player.playing) player.stop()
-                            }}
-                            className={`cursor-pointer flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm transition-all duration-200 ${
-                              selected
-                                ? 'border-neon-pink/60 bg-neon-pink/12 neon-glow-pink'
-                                : opt.recommended
-                                  ? 'border-neon-gold/30 bg-surface-hover hover:border-neon-gold/50'
-                                  : 'border-white/5 bg-surface hover:border-neon-pink/30 hover:bg-surface-hover'
-                            }`}
-                          >
-                            <span className={`min-w-[3.5rem] font-disco text-xl font-bold ${
-                              selected ? 'text-neon-pink' : opt.recommended ? 'text-neon-gold' : 'text-text-primary'
-                            }`}>
-                              {opt.bpm}
-                            </span>
-                            <span className="text-text-secondary">{opt.label}</span>
-                            {opt.recommended && (
-                              <span className="ml-auto rounded-full bg-neon-gold/20 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-neon-gold">
-                                Recomendado
-                              </span>
-                            )}
-                            {selected && (
-                              <span className="ml-2 text-lg text-neon-pink">✓</span>
-                            )}
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </div>
-
-                  <div className="mx-auto max-w-md">
-                    <SongWaveform
-                      audioBuffer={audioFile.audioBuffer}
-                      currentTimeRef={player.currentTimeRef}
-                      duration={player.duration}
-                      playing={player.playing}
-                      onSeek={player.seek}
-                    />
-                  </div>
-
-                  <div className="mx-auto max-w-md">
-                    <button
-                      onClick={() => setEditorOpen(true)}
-                      className="cursor-pointer inline-flex items-center justify-center gap-1.5 w-full rounded-lg border border-white/5 bg-black/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-text-secondary transition-all hover:border-neon-cyan/30 hover:text-neon-cyan"
-                    >
-                      <Icon icon="tabler:edit" className="w-4 h-4" />
-                      Editar canción
-                    </button>
-                  </div>
-
-                  <div className="mx-auto max-w-md text-left">
-                    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-neon-cyan">
-                      Beat Offset (ms)
-                    </label>
-                    <input
-                      type="number"
-                      value={editableOffset}
-                      onChange={(e) => {
-                        setEditableOffset(Number(e.target.value))
-                        if (player.playing) player.stop()
-                      }}
-                      className="w-full rounded-lg border border-white/5 bg-black px-3 py-2 text-sm text-text-primary outline-none transition-all focus:border-neon-cyan/50 focus:ring-1 focus:ring-neon-cyan/30"
-                    />
-                    <p className="mt-1 text-[11px] text-text-muted">
-                      El offset no cambia entre opciones de BPM
-                    </p>
-                  </div>
-
-                  <div className="mx-auto max-w-xs">
-                    <button
-                      onClick={() => player.playing ? player.stop() : player.play()}
-                      className={`w-full cursor-pointer inline-flex items-center justify-center gap-2 rounded-lg border px-6 py-3 font-disco text-base font-bold uppercase tracking-wider transition-all duration-200 ${
-                        player.playing
-                          ? 'border-neon-pink/50 bg-neon-pink/12 text-neon-pink hover:bg-neon-pink/20'
-                          : 'border-neon-cyan/50 bg-neon-cyan/12 text-neon-cyan hover:bg-neon-cyan/20'
-                      }`}
-                    >
-                      <Icon icon={player.playing ? 'tabler:player-stop-filled' : 'tabler:player-play-filled'} className="w-5 h-5" />
-                      {player.playing ? 'Detener' : 'Reproducir'}
-                    </button>
-                  </div>
-
-                  <div className="mx-auto flex max-w-md items-center gap-4">
-                    <div className="flex flex-1 items-center gap-2">
-                      <Icon icon="tabler:volume" className="w-4 h-4 text-text-muted shrink-0" />
-                      <input
-                        type="range"
-                        min={0}
-                        max={1}
-                        step={0.05}
-                        value={volume}
-                        onChange={(e) => setVolume(Number(e.target.value))}
-                        className="range-neon flex-1"
-                      />
-                    </div>
-                    <div className="flex flex-1 items-center gap-2">
-                      <Icon icon="tabler:wave-sine" className="w-4 h-4 text-text-muted shrink-0" />
-                      <input
-                        type="range"
-                        min={0}
-                        max={1}
-                        step={0.05}
-                        value={metronomeVolume}
-                        onChange={(e) => setMetronomeVolume(Number(e.target.value))}
-                        className="range-neon flex-1"
-                      />
-                    </div>
-                    <button
-                      onClick={() => player.setMetronomeEnabled(!player.metronomeEnabled)}
-                      className={`cursor-pointer flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider transition-all duration-200 ${
-                        player.metronomeEnabled
-                          ? 'border-neon-cyan/50 bg-neon-cyan/12 text-neon-cyan hover:bg-neon-cyan/20'
-                          : 'border-white/10 bg-white/5 text-text-muted hover:border-text-muted/30'
-                      }`}
-                    >
-                      <Icon icon={player.metronomeEnabled ? 'tabler:speakerphone' : 'tabler:speakerphone-off'} className="w-4 h-4" />
-                      Beat
-                    </button>
-                  </div>
-
-                  <div className="mx-auto max-w-xs">
-                    <button
-                      onClick={handleExport}
-                      disabled={exporting}
-                      className={`animate-gradient relative w-full overflow-hidden rounded-lg bg-gradient-to-r from-neon-pink via-neon-purple to-neon-cyan px-6 py-3 font-disco text-base font-bold uppercase tracking-wider text-white shadow-lg transition-all duration-300 inline-flex items-center justify-center gap-2 ${
-                        exporting
-                          ? 'cursor-not-allowed opacity-50'
-                          : 'cursor-pointer hover:scale-[1.02] hover:shadow-neon-pink/30'
-                      }`}
-                    >
-                      <Icon icon={exporting ? 'tabler:loader-2' : 'tabler:download'} className={`w-5 h-5 ${exporting ? 'animate-spin' : ''}`} />
-                      <span className="relative z-10">
-                        {exporting ? 'Generando ZIP...' : 'Exportar ZIP'}
-                      </span>
-                    </button>
+                            onClick={handleExport}
+                            disabled={exporting}
+                            className={`-rotate-1 flex-1 bg-gradient-to-r from-neon-pink via-neon-purple to-neon-cyan text-white px-10 py-3 text-base font-bold uppercase tracking-wider inline-flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 ${
+                            exporting ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
+                          }`}
+                        >
+                          <Icon icon={exporting ? 'tabler:loader-2' : 'tabler:download'} className={`w-5 h-5 ${exporting ? 'animate-spin' : ''}`} />
+                          <span>
+                            {exporting ? 'Generando ZIP...' : 'Exportar ZIP'}
+                          </span>
+                        </button>
+                        </ElectricBorder>
+                      </div>
+                    </aside>
                   </div>
                 </div>
-              </div>
+              </article>
             )}
-          </div>
+          </section>
         )}
 
         {editorOpen && snapshot && audioFile && (
@@ -465,9 +473,11 @@ function App() {
             volume={volume}
             metronomeVolume={metronomeVolume}
             metronomeEnabled={player.metronomeEnabled}
+            muted={muted}
             onVolumeChange={setVolume}
             onMetronomeVolumeChange={setMetronomeVolume}
             onMetronomeToggle={() => player.setMetronomeEnabled(!player.metronomeEnabled)}
+            onMuteToggle={() => setMuted(!muted)}
             onApply={(values) => {
               setSelectedBpmOption(values.bpm)
               setEditableOffset(values.offset)
@@ -481,7 +491,7 @@ function App() {
           />
         )}
 
-        <footer className="mt-12 text-center text-[11px] text-text-muted">
+        <footer className="mt-12 text-center text-sm text-text-muted">
           {audioFile && (
             <p className="mb-1 truncate px-2">
               {audioFile.fileName}

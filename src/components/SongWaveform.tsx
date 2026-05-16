@@ -127,7 +127,7 @@ export default function SongWaveform({ audioBuffer, currentTimeRef, duration, pl
     <div ref={containerRef} className="w-full">
       <canvas
         ref={canvasRef}
-        className="w-full cursor-pointer rounded-lg"
+        className="w-full cursor-pointer"
         height={100}
         onClick={handleClick}
         style={{ imageRendering: 'pixelated', display: 'block' }}
