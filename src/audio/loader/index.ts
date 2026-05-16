@@ -13,16 +13,24 @@ export async function loadAudioFile(file: File): Promise<AudioFile> {
 
   try {
     const metadata = await parseBlob(file)
+    console.log('Metadata:', metadata)
+
     if (metadata.common.title) title = metadata.common.title
+
     if (metadata.common.artist) {
       artist = metadata.common.artist
     } else if (metadata.common.artists?.length) {
       artist = metadata.common.artists[0]
     } else if (metadata.common.albumartist) {
       artist = metadata.common.albumartist
+    } else if (metadata.native?.vorbis) {
+      const performer = metadata.native.vorbis.find(
+        (t) => t.id.toUpperCase() === 'PERFORMER',
+      )
+      if (performer) artist = String(performer.value)
     }
-  } catch {
-    // metadata no disponible, usar nombre de archivo
+  } catch (err) {
+    console.warn('Metadata parse failed:', err)
   }
 
   return {
