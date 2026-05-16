@@ -4,11 +4,11 @@ const GAME_MIN = 120
 const GAME_MAX = 220
 
 const FACTORS = [
-  { factor: 0.25, label: '1/4 de velocidad' },
-  { factor: 0.5, label: 'Mitad de velocidad' },
+  { factor: 0.5, label: '0.5×' },
+  { factor: 0.75, label: '0.75×' },
   { factor: 1, label: 'Original' },
-  { factor: 2, label: 'Doble de velocidad' },
-  { factor: 4, label: 'Cuádruple de velocidad' },
+  { factor: 1.25, label: '1.25×' },
+  { factor: 1.5, label: '1.5×' },
 ]
 
 export function generateBpmOptions(rawBpm: number): BpmOption[] {
