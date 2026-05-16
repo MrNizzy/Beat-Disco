@@ -1,5 +1,29 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "XXIX";
+  src: url("/XXIX.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Montserrat";
+  src: url("/Montserrat-normal-400-latin.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Impact";
+  src: url("/Impact.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
   --color-surface: #111122;
   --color-surface-hover: #1a1a30;
@@ -11,11 +35,16 @@
   --color-text-primary: #ffffff;
   --color-text-secondary: #8888aa;
   --color-text-muted: #555577;
-  --font-disco: "Russo One", sans-serif;
-  --font-body: "Inter", sans-serif;
+  --font-disco: "Impact", sans-serif;
+  --font-body: "Montserrat", sans-serif;
 }
 
 body {
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  tab-size: 4;
+  -webkit-tap-highlight-color: transparent;
   background-color: #050505;
   background-image:
     linear-gradient(rgba(255, 45, 149, 0.04) 1px, transparent 1px),
@@ -53,10 +82,25 @@ body {
 }
 
 .neon-text {
-  text-shadow:
-    0 0 20px var(--color-neon-pink),
-    0 0 50px color-mix(in srgb, var(--color-neon-pink) 40%, transparent);
+  letter-spacing: .025em;
+  line-height: .8;
+  text-shadow: -2px -1px 0 #ff008c, 2px 1px 0 #00ceff;
 }
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #ffffff;
+  color: #ff2d95;
+  border: 0;
+  transform: rotate(-1deg);
+  transition: all .2s cubic-bezier(.4,0,.2,1);
+  cursor: pointer;
+}
+.btn-primary:hover { opacity: .9; }
+.btn-primary:disabled { opacity: .5; cursor: not-allowed; }
 
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -66,35 +110,35 @@ body {
 input[type="range"].range-neon {
   -webkit-appearance: none;
   appearance: none;
-  height: 4px;
+  height: 8px;
   background: rgba(255, 45, 149, 0.2);
-  border-radius: 2px;
+  border-radius: 4px;
   outline: none;
   cursor: pointer;
 }
 
 input[type="range"].range-neon::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 14px;
-  height: 14px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: #00f0ff;
   cursor: pointer;
-  box-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
 }
 
 input[type="range"].range-neon::-moz-range-track {
-  height: 4px;
+  height: 8px;
   background: rgba(255, 45, 149, 0.2);
-  border-radius: 2px;
+  border-radius: 4px;
 }
 
 input[type="range"].range-neon::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: #00f0ff;
   cursor: pointer;
   border: none;
-  box-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
 }
