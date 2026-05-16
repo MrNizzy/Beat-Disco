@@ -22,3 +22,23 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# AI Tooling
+.claude/
+.cursor/
+.windsurf/
+.opencode/
+.copilot/
+.ai/
+*.ai-session
+.ai-log
+ai-*.json
+skills-lock.json
+
+# Agent config & cache
+.gemini/
+.agents/
+GEMINI.md
+
+# SpecKit / Spec-Driven Development
+.specify/
