@@ -1,12 +1,18 @@
 import { useRef, useState } from 'react'
 import { loadAudioFile } from './audio/loader/index'
 import { analyseAudio } from './audio/analyser/index'
+import { useAudioPlayer } from './audio/player/useAudioPlayer'
 import type { AnalysisResult } from './song/config/types'
 import type { AudioFile } from './audio/loader/types'
 import { exportSong } from './export/index'
 import JSZip from 'jszip'
 import { configToJson } from './song/config/index'
 import ParticlesBackground from './components/ParticlesBackground'
+import EdgeWaves from './components/EdgeWaves'
+import BeatPulse from './components/BeatPulse'
+import SongWaveform from './components/SongWaveform'
+import SongEditorModal from './components/SongEditorModal'
+import type { EditorSnapshot } from './components/SongEditorModal'
 
 function MusicNote() {
   return (
@@ -28,9 +34,25 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [exporting, setExporting] = useState(false)
   const [error, setError] = useState('')
+  const [volume, setVolume] = useState(1.0)
+  const [metronomeVolume, setMetronomeVolume] = useState(0.3)
+  const [trimStartMs, setTrimStartMs] = useState(0)
+  const [trimEndMs, setTrimEndMs] = useState(0)
+  const [editorOpen, setEditorOpen] = useState(false)
+  const [snapshot, setSnapshot] = useState<EditorSnapshot | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const player = useAudioPlayer(
+    audioFile?.audioBuffer ?? null,
+    selectedBpmOption,
+    editableOffset,
+    volume,
+    metronomeVolume,
+    trimStartMs,
+    trimEndMs,
+  )
 
   async function handleFile(file: File) {
+    player.stop()
     setError('')
     setAnalysis(null)
     setAudioFile(null)
@@ -48,6 +70,19 @@ function App() {
 
       const firstRec = result.bpmOptions.find((o) => o.recommended) ?? result.bpmOptions.find((o) => o.isOriginal)!
       setSelectedBpmOption(firstRec.bpm)
+
+      const durMs = Math.floor(af.audioBuffer.duration * 1000)
+      setTrimStartMs(0)
+      setTrimEndMs(durMs)
+      setSnapshot({
+        bpm: firstRec.bpm,
+        bpmOptions: result.bpmOptions,
+        offset: result.beatOffset,
+        title: af.title,
+        artist: af.artist,
+        trimStartMs: 0,
+        trimEndMs: durMs,
+      })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al cargar o analizar el audio')
     } finally {
@@ -67,9 +102,17 @@ function App() {
       const folderName = artist ? `${sanitize(title)} - ${sanitize(artist)}` : sanitize(title)
       const songName = title
 
+      const durationMs = audioFile.audioBuffer.duration * 1000
       const result = await exportSong(
         audioFile.audioBuffer,
-        { tempo: selectedBpmOption, beatOffset: editableOffset, songName, performedBy: artist ? [artist] : [] },
+        {
+          tempo: selectedBpmOption,
+          beatOffset: editableOffset,
+          songName,
+          performedBy: artist ? [artist] : [],
+          startSongOffset: trimStartMs,
+          endSongOffset: Math.max(0, Math.round(durationMs) - trimEndMs),
+        },
       )
 
       const zip = new JSZip()
@@ -93,7 +136,9 @@ function App() {
 
   return (
     <div className="relative min-h-screen">
-      <ParticlesBackground />
+      <ParticlesBackground playing={player.playing} beatPhaseRef={player.beatPhaseRef} metronomeEnabled={player.metronomeEnabled} />
+      <EdgeWaves analyserRef={player.analyserRef} playing={player.playing} />
+      <BeatPulse beatPhaseRef={player.beatPhaseRef} playing={player.playing} />
       <main className="relative z-10 mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
         <header className="mb-8 text-center">
           <h1 className="font-disco text-4xl font-bold uppercase tracking-wider text-white sm:text-5xl neon-text">
@@ -140,16 +185,17 @@ function App() {
         )}
 
         {analysis && audioFile && (
-          <div className="mt-8 animate-fade-in space-y-6 rounded-xl border border-white/5 bg-surface/80 p-5 text-center backdrop-blur-sm sm:p-6">
-            <div>
-              <h2 className="font-disco text-lg uppercase tracking-wider text-neon-cyan sm:text-xl">
-                Resultados
-              </h2>
-              <p className="mt-1 text-xs text-text-muted sm:text-sm">
-                {audioFile.audioBuffer.duration.toFixed(1)}s &middot; {audioFile.audioBuffer.sampleRate}Hz &middot;{' '}
-                {audioFile.audioBuffer.numberOfChannels} canales
-              </p>
-            </div>
+          <div className="relative mt-8 animate-fade-in rounded-xl border border-white/5 bg-surface/80 p-5 text-center backdrop-blur-sm sm:p-6">
+            <div className="relative z-10 space-y-6">
+              <div>
+                <h2 className="font-disco text-lg uppercase tracking-wider text-neon-cyan sm:text-xl">
+                  Resultados
+                </h2>
+                <p className="mt-1 text-xs text-text-muted sm:text-sm">
+                  {audioFile.audioBuffer.duration.toFixed(1)}s &middot; {audioFile.audioBuffer.sampleRate}Hz &middot;{' '}
+                  {audioFile.audioBuffer.numberOfChannels} canales
+                </p>
+              </div>
 
             <div className="mx-auto flex max-w-md flex-col gap-4">
               <div className="text-left">
@@ -187,8 +233,11 @@ function App() {
                     <button
                       key={opt.bpm}
                       type="button"
-                      onClick={() => setSelectedBpmOption(opt.bpm)}
-                      className={`flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm transition-all duration-200 ${
+                      onClick={() => {
+                        setSelectedBpmOption(opt.bpm)
+                        if (player.playing) player.stop()
+                      }}
+                      className={`cursor-pointer flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm transition-all duration-200 ${
                         selected
                           ? 'border-neon-pink/60 bg-neon-pink/12 neon-glow-pink'
                           : opt.recommended
@@ -216,6 +265,25 @@ function App() {
               </div>
             </div>
 
+            <div className="mx-auto max-w-md">
+              <SongWaveform
+                audioBuffer={audioFile.audioBuffer}
+                currentTimeRef={player.currentTimeRef}
+                duration={player.duration}
+                playing={player.playing}
+                onSeek={player.seek}
+              />
+            </div>
+
+            <div className="mx-auto max-w-md">
+              <button
+                onClick={() => setEditorOpen(true)}
+                className="cursor-pointer w-full rounded-lg border border-white/5 bg-black/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-text-secondary transition-all hover:border-neon-cyan/30 hover:text-neon-cyan"
+              >
+                ✂ Editar canción
+              </button>
+            </div>
+
             <div className="mx-auto max-w-md text-left">
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-neon-cyan">
                 Beat Offset (ms)
@@ -223,12 +291,66 @@ function App() {
               <input
                 type="number"
                 value={editableOffset}
-                onChange={(e) => setEditableOffset(Number(e.target.value))}
-                  className="w-full rounded-lg border border-white/5 bg-black px-3 py-2 text-sm text-text-primary outline-none transition-all focus:border-neon-cyan/50 focus:ring-1 focus:ring-neon-cyan/30"
+                onChange={(e) => {
+                  setEditableOffset(Number(e.target.value))
+                  if (player.playing) player.stop()
+                }}
+                className="w-full rounded-lg border border-white/5 bg-black px-3 py-2 text-sm text-text-primary outline-none transition-all focus:border-neon-cyan/50 focus:ring-1 focus:ring-neon-cyan/30"
               />
               <p className="mt-1 text-[11px] text-text-muted">
                 El offset no cambia entre opciones de BPM
               </p>
+            </div>
+
+            <div className="mx-auto max-w-xs">
+              <button
+                onClick={() => player.playing ? player.stop() : player.play()}
+                className={`w-full cursor-pointer rounded-lg border px-6 py-3 font-disco text-base font-bold uppercase tracking-wider transition-all duration-200 ${
+                  player.playing
+                    ? 'border-neon-pink/50 bg-neon-pink/12 text-neon-pink hover:bg-neon-pink/20'
+                    : 'border-neon-cyan/50 bg-neon-cyan/12 text-neon-cyan hover:bg-neon-cyan/20'
+                }`}
+              >
+                {player.playing ? '⏹ Detener' : '▶ Reproducir'}
+              </button>
+            </div>
+
+            <div className="mx-auto flex max-w-md items-center gap-4">
+              <div className="flex flex-1 items-center gap-2">
+                <span className="text-xs text-text-muted">Vol</span>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={volume}
+                  onChange={(e) => setVolume(Number(e.target.value))}
+                  className="range-neon flex-1"
+                />
+              </div>
+              <div className="flex flex-1 items-center gap-2">
+                <span className="text-xs text-text-muted">Met</span>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={metronomeVolume}
+                  onChange={(e) => setMetronomeVolume(Number(e.target.value))}
+                  className="range-neon flex-1"
+                />
+              </div>
+              <button
+                onClick={() => player.setMetronomeEnabled(!player.metronomeEnabled)}
+                className={`cursor-pointer flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-bold uppercase tracking-wider transition-all duration-200 ${
+                  player.metronomeEnabled
+                    ? 'border-neon-cyan/50 bg-neon-cyan/12 text-neon-cyan hover:bg-neon-cyan/20'
+                    : 'border-white/10 bg-white/5 text-text-muted hover:border-text-muted/30'
+                }`}
+              >
+                <span>{player.metronomeEnabled ? '🔊' : '🔇'}</span>
+                <span>Beat</span>
+              </button>
             </div>
 
             <div className="mx-auto max-w-xs">
@@ -247,6 +369,36 @@ function App() {
               </button>
             </div>
           </div>
+        </div>
+        )}
+
+        {editorOpen && snapshot && audioFile && (
+          <SongEditorModal
+            audioBuffer={audioFile.audioBuffer}
+            duration={player.duration}
+            snapshot={snapshot}
+            playing={player.playing}
+            currentTimeRef={player.currentTimeRef}
+            onPlay={() => player.play()}
+            onStop={() => player.stop()}
+            onSeek={player.seek}
+            volume={volume}
+            metronomeVolume={metronomeVolume}
+            metronomeEnabled={player.metronomeEnabled}
+            onVolumeChange={setVolume}
+            onMetronomeVolumeChange={setMetronomeVolume}
+            onMetronomeToggle={() => player.setMetronomeEnabled(!player.metronomeEnabled)}
+            onApply={(values) => {
+              setSelectedBpmOption(values.bpm)
+              setEditableOffset(values.offset)
+              setEditableTitle(values.title)
+              setEditableArtist(values.artist)
+              setTrimStartMs(values.trimStartMs)
+              setTrimEndMs(values.trimEndMs)
+              setEditorOpen(false)
+            }}
+            onClose={() => setEditorOpen(false)}
+          />
         )}
 
         <footer className="mt-12 text-center text-[11px] text-text-muted">
