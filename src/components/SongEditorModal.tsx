@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { Icon } from '@iconify/react'
 import type { BpmOption } from '../song/config/types'
 
 export interface EditorSnapshot {
@@ -89,7 +90,6 @@ export default function SongEditorModal({
     })
   }
 
-  // Waveform offscreen render
   useEffect(() => {
     const container = containerRef.current
     const canvas = canvasRef.current
@@ -147,7 +147,6 @@ export default function SongEditorModal({
     }
   }, [audioBuffer])
 
-  // RAF loop for playhead
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -218,6 +217,31 @@ export default function SongEditorModal({
     dragging.current = null
   }, [])
 
+  function TrimHandle({ side, color }: { side: 'start' | 'end', color: string }) {
+    const pos = side === 'start' ? localTrimStart : localTrimEnd
+    const isPink = color === 'pink'
+    const bgClass = isPink ? 'bg-neon-pink' : 'bg-neon-cyan'
+    const lineClass = isPink ? 'bg-neon-pink shadow-[0_0_8px_rgba(255,45,149,0.5)]' : 'bg-neon-cyan shadow-[0_0_8px_rgba(0,240,255,0.5)]'
+    const notchShadow = isPink ? 'shadow-[0_0_12px_rgba(255,45,149,0.6)]' : 'shadow-[0_0_12px_rgba(0,240,255,0.6)]'
+
+    return (
+      <div
+        className="absolute inset-y-0 z-30"
+        style={{ left: `${(pos / durationMs) * 100}%` }}
+      >
+        <div
+          className="absolute inset-y-0 -left-[23px] right-[23px] z-30 cursor-ew-resize touch-none"
+          onPointerDown={handlePointerDown(side)}
+        >
+          <div className={`pointer-events-none absolute -top-1 left-1/2 -translate-x-1/2 w-7 h-5 rounded-b-md flex items-center justify-center ${notchShadow} ${bgClass}`}>
+            <Icon icon="tabler:grip-horizontal" className="w-4 h-3 text-white" />
+          </div>
+        </div>
+        <div className={`pointer-events-none mx-auto w-0.5 h-full ${lineClass}`} />
+      </div>
+    )
+  }
+
   return (
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-200 ${closing ? 'opacity-0' : 'opacity-100'}`}
@@ -229,11 +253,12 @@ export default function SongEditorModal({
       <div className={`relative w-full max-w-5xl rounded-xl border border-white/10 bg-[#0a0a1a] p-6 shadow-2xl max-h-[90vh] overflow-y-auto transition-all duration-200 ${closing ? 'scale-95 opacity-0' : 'scale-100 opacity-100'}`}>
         <button
           onClick={handleClose}
-          className="absolute right-4 top-4 cursor-pointer text-lg text-text-muted transition-colors hover:text-white"
+          className="absolute right-4 top-4 cursor-pointer text-text-muted transition-colors hover:text-white"
           aria-label="Cerrar"
-        >✕</button>
+        >
+          <Icon icon="tabler:x" className="w-5 h-5" />
+        </button>
 
-        {/* Title & Artist — above waveform */}
         <div className="mb-5 flex gap-4">
           <div className="flex-1">
             <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-neon-cyan">Título</label>
@@ -255,7 +280,6 @@ export default function SongEditorModal({
           </div>
         </div>
 
-        {/* Large Waveform with trim */}
         <div
           ref={containerRef}
           className="relative mb-3 w-full select-none"
@@ -274,7 +298,6 @@ export default function SongEditorModal({
             style={{ imageRendering: 'pixelated' }}
           />
 
-          {/* Dimmed overlay — before trim start */}
           {localTrimStart > 0 && (
             <div
               className="pointer-events-none absolute inset-y-0 left-0 z-10 bg-black/60"
@@ -282,7 +305,6 @@ export default function SongEditorModal({
             />
           )}
 
-          {/* Dimmed overlay — after trim end */}
           {localTrimEnd < durationMs && (
             <div
               className="pointer-events-none absolute inset-y-0 right-0 z-10 bg-black/60"
@@ -290,7 +312,6 @@ export default function SongEditorModal({
             />
           )}
 
-          {/* Playhead */}
           {playing && (
             <div
               className="pointer-events-none absolute inset-y-0 z-20"
@@ -301,28 +322,10 @@ export default function SongEditorModal({
             </div>
           )}
 
-          {/* Trim handle — start */}
-          <div
-            className="absolute inset-y-0 z-30 cursor-ew-resize"
-            style={{ left: `${(localTrimStart / durationMs) * 100}%` }}
-            onPointerDown={handlePointerDown('start')}
-          >
-            <div className="mx-auto w-0.5 h-full bg-neon-pink shadow-[0_0_8px_rgba(255,45,149,0.5)]" />
-            <div className="pointer-events-none absolute -top-2.5 left-1/2 -translate-x-1/2 text-sm leading-none text-neon-pink drop-shadow-[0_0_6px_rgba(255,45,149,0.7)]">◆</div>
-          </div>
-
-          {/* Trim handle — end */}
-          <div
-            className="absolute inset-y-0 z-30 cursor-ew-resize"
-            style={{ left: `${(localTrimEnd / durationMs) * 100}%` }}
-            onPointerDown={handlePointerDown('end')}
-          >
-            <div className="mx-auto w-0.5 h-full bg-neon-cyan shadow-[0_0_8px_rgba(0,240,255,0.5)]" />
-            <div className="pointer-events-none absolute -top-2.5 left-1/2 -translate-x-1/2 text-sm leading-none text-neon-cyan drop-shadow-[0_0_6px_rgba(0,240,255,0.7)]">◆</div>
-          </div>
+          <TrimHandle side="start" color="pink" />
+          <TrimHandle side="end" color="cyan" />
         </div>
 
-        {/* Trim ms inputs */}
         <div className="mb-5 flex gap-4">
           <div className="flex-1">
             <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-text-muted">Inicio (ms)</label>
@@ -350,7 +353,6 @@ export default function SongEditorModal({
           </div>
         </div>
 
-        {/* BPM selector */}
         <div className="mb-4">
           <label className="mb-2 block text-[10px] font-semibold uppercase tracking-wider text-neon-cyan">Velocidad (BPM)</label>
           <div className="flex flex-wrap gap-2">
@@ -375,7 +377,6 @@ export default function SongEditorModal({
           </div>
         </div>
 
-        {/* Offset */}
         <div className="mb-4">
           <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-neon-cyan">Beat Offset (ms)</label>
           <input
@@ -386,21 +387,20 @@ export default function SongEditorModal({
           />
         </div>
 
-        {/* Play controls row */}
         <div className="mb-5 flex items-center gap-4">
           <button
             onClick={() => (playing ? onStop() : onPlay())}
-            className={`cursor-pointer rounded-lg border px-5 py-2 font-disco text-sm font-bold uppercase tracking-wider transition-all ${
+            className={`cursor-pointer flex items-center gap-2 rounded-lg border px-5 py-2 font-disco text-sm font-bold uppercase tracking-wider transition-all ${
               playing
                 ? 'border-neon-pink/50 bg-neon-pink/12 text-neon-pink hover:bg-neon-pink/20'
                 : 'border-neon-cyan/50 bg-neon-cyan/12 text-neon-cyan hover:bg-neon-cyan/20'
             }`}
           >
-            {playing ? '⏹' : '▶'}
+            <Icon icon={playing ? 'tabler:player-stop-filled' : 'tabler:player-play-filled'} className="w-5 h-5" />
           </button>
 
           <div className="flex flex-1 items-center gap-2">
-            <span className="text-[10px] text-text-muted">Vol</span>
+            <Icon icon="tabler:volume" className="w-4 h-4 text-text-muted shrink-0" />
             <input
               type="range"
               min={0}
@@ -413,7 +413,7 @@ export default function SongEditorModal({
           </div>
 
           <div className="flex flex-1 items-center gap-2">
-            <span className="text-[10px] text-text-muted">Met</span>
+            <Icon icon="tabler:wave-sine" className="w-4 h-4 text-text-muted shrink-0" />
             <input
               type="range"
               min={0}
@@ -427,31 +427,32 @@ export default function SongEditorModal({
 
           <button
             onClick={onMetronomeToggle}
-            className={`cursor-pointer flex items-center gap-1 rounded border px-2 py-1 text-[10px] font-bold uppercase tracking-wider transition-all ${
+            className={`cursor-pointer flex items-center gap-1.5 rounded border px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all ${
               metronomeEnabled
                 ? 'border-neon-cyan/50 bg-neon-cyan/12 text-neon-cyan'
                 : 'border-white/10 bg-white/5 text-text-muted'
             }`}
           >
-            <span>{metronomeEnabled ? '🔊' : '🔇'}</span>
-            <span>Beat</span>
+            <Icon icon={metronomeEnabled ? 'tabler:speakerphone' : 'tabler:speakerphone-off'} className="w-4 h-4" />
+            Beat
           </button>
         </div>
 
-        {/* Reset + Done */}
         <div className="flex items-center justify-between border-t border-white/5 pt-4">
           <button
             onClick={handleReset}
-            className="cursor-pointer rounded border border-white/10 bg-black/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-text-muted transition-all hover:border-neon-cyan/30 hover:text-neon-cyan"
+            className="cursor-pointer flex items-center gap-1.5 rounded border border-white/10 bg-black/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-text-muted transition-all hover:border-neon-cyan/30 hover:text-neon-cyan"
           >
-            ↺ Reset
+            <Icon icon="tabler:refresh" className="w-4 h-4" />
+            Reset
           </button>
           <button
             onClick={handleDone}
-            className="animate-gradient cursor-pointer rounded bg-gradient-to-r from-neon-pink via-neon-purple to-neon-cyan px-6 py-2 font-disco text-sm font-bold uppercase tracking-wider text-white shadow-lg transition-all hover:scale-[1.02]"
+            className="animate-gradient cursor-pointer flex items-center gap-2 rounded bg-gradient-to-r from-neon-pink via-neon-purple to-neon-cyan px-6 py-2 font-disco text-sm font-bold uppercase tracking-wider text-white shadow-lg transition-all hover:scale-[1.02]"
             style={{ backgroundSize: '200% 200%' }}
           >
-            ✓ Done
+            <Icon icon="tabler:check" className="w-5 h-5" />
+            Done
           </button>
         </div>
       </div>

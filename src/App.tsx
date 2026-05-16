@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { Icon } from '@iconify/react'
 import { loadAudioFile } from './audio/loader/index'
 import { analyseAudio } from './audio/analyser/index'
 import { useAudioPlayer } from './audio/player/useAudioPlayer'
@@ -14,16 +15,6 @@ import SongWaveform from './components/SongWaveform'
 import SongEditorModal from './components/SongEditorModal'
 import type { EditorSnapshot } from './components/SongEditorModal'
 import { useVolumeStore } from './lib/store/useVolumeStore'
-
-function MusicNote({ className = 'w-10 h-10' }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className={className}>
-      <path d="M9 18V5l12-2v13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-      <circle cx="6" cy="18" r="3" stroke="currentColor" strokeWidth="1.5"/>
-      <circle cx="18" cy="16" r="3" stroke="currentColor" strokeWidth="1.5"/>
-    </svg>
-  )
-}
 
 function App() {
   const volume = useVolumeStore((s) => s.volume)
@@ -198,11 +189,10 @@ function App() {
       <EdgeWaves analyserRef={player.analyserRef} playing={player.playing} />
       <BeatPulse beatPhaseRef={player.beatPhaseRef} playing={player.playing} />
 
-      {/* Drag overlay */}
       {dragOver && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
           <div className="flex flex-col items-center gap-4 rounded-2xl border-2 border-dashed border-neon-cyan/60 px-12 py-16">
-            <MusicNote className="w-14 h-14 text-neon-cyan drop-shadow-[0_0_20px_rgba(0,240,255,0.6)]" />
+            <Icon icon="tabler:music" className="w-14 h-14 text-neon-cyan drop-shadow-[0_0_20px_rgba(0,240,255,0.6)]" />
             <p className="font-disco text-2xl font-bold uppercase tracking-wider text-neon-cyan drop-shadow-[0_0_10px_rgba(0,240,255,0.4)]">
               Suelta para cargar
             </p>
@@ -221,7 +211,6 @@ function App() {
         </header>
 
         {!audioFile ? (
-          /* --- No song loaded: big drop zone --- */
           <div className="flex items-center justify-center min-h-[55vh] sm:min-h-[60vh]">
             <div
               onClick={() => inputRef.current?.click()}
@@ -235,7 +224,7 @@ function App() {
                 onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
               />
               <div className="mb-4 text-neon-pink/50 transition-colors group-hover:text-neon-pink/80">
-                <MusicNote />
+                <Icon icon="tabler:music" className="w-10 h-10 sm:w-12 sm:h-12" />
               </div>
               {loading ? (
                 <div className="flex flex-col items-center gap-3">
@@ -253,14 +242,14 @@ function App() {
             </div>
           </div>
         ) : (
-          /* --- Song loaded: results + new song button --- */
           <div className="flex flex-col gap-4">
-            <div className="flex justify-end">
+            <div className="flex justify-center">
               <button
                 onClick={handleNewSong}
-                className="cursor-pointer rounded-lg border border-white/5 bg-black/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-text-secondary transition-all hover:border-neon-cyan/30 hover:text-neon-cyan"
+                className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg border border-white/5 bg-black/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-text-secondary transition-all hover:border-neon-cyan/30 hover:text-neon-cyan"
               >
-                🎵 Nueva canción
+                <Icon icon="tabler:music-plus" className="w-4 h-4" />
+                Nueva canción
               </button>
             </div>
 
@@ -364,9 +353,10 @@ function App() {
                   <div className="mx-auto max-w-md">
                     <button
                       onClick={() => setEditorOpen(true)}
-                      className="cursor-pointer w-full rounded-lg border border-white/5 bg-black/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-text-secondary transition-all hover:border-neon-cyan/30 hover:text-neon-cyan"
+                      className="cursor-pointer inline-flex items-center justify-center gap-1.5 w-full rounded-lg border border-white/5 bg-black/40 px-4 py-2 text-xs font-bold uppercase tracking-wider text-text-secondary transition-all hover:border-neon-cyan/30 hover:text-neon-cyan"
                     >
-                      ✂ Editar canción
+                      <Icon icon="tabler:edit" className="w-4 h-4" />
+                      Editar canción
                     </button>
                   </div>
 
@@ -391,19 +381,20 @@ function App() {
                   <div className="mx-auto max-w-xs">
                     <button
                       onClick={() => player.playing ? player.stop() : player.play()}
-                      className={`w-full cursor-pointer rounded-lg border px-6 py-3 font-disco text-base font-bold uppercase tracking-wider transition-all duration-200 ${
+                      className={`w-full cursor-pointer inline-flex items-center justify-center gap-2 rounded-lg border px-6 py-3 font-disco text-base font-bold uppercase tracking-wider transition-all duration-200 ${
                         player.playing
                           ? 'border-neon-pink/50 bg-neon-pink/12 text-neon-pink hover:bg-neon-pink/20'
                           : 'border-neon-cyan/50 bg-neon-cyan/12 text-neon-cyan hover:bg-neon-cyan/20'
                       }`}
                     >
-                      {player.playing ? '⏹ Detener' : '▶ Reproducir'}
+                      <Icon icon={player.playing ? 'tabler:player-stop-filled' : 'tabler:player-play-filled'} className="w-5 h-5" />
+                      {player.playing ? 'Detener' : 'Reproducir'}
                     </button>
                   </div>
 
                   <div className="mx-auto flex max-w-md items-center gap-4">
                     <div className="flex flex-1 items-center gap-2">
-                      <span className="text-xs text-text-muted">Vol</span>
+                      <Icon icon="tabler:volume" className="w-4 h-4 text-text-muted shrink-0" />
                       <input
                         type="range"
                         min={0}
@@ -415,7 +406,7 @@ function App() {
                       />
                     </div>
                     <div className="flex flex-1 items-center gap-2">
-                      <span className="text-xs text-text-muted">Met</span>
+                      <Icon icon="tabler:wave-sine" className="w-4 h-4 text-text-muted shrink-0" />
                       <input
                         type="range"
                         min={0}
@@ -434,8 +425,8 @@ function App() {
                           : 'border-white/10 bg-white/5 text-text-muted hover:border-text-muted/30'
                       }`}
                     >
-                      <span>{player.metronomeEnabled ? '🔊' : '🔇'}</span>
-                      <span>Beat</span>
+                      <Icon icon={player.metronomeEnabled ? 'tabler:speakerphone' : 'tabler:speakerphone-off'} className="w-4 h-4" />
+                      Beat
                     </button>
                   </div>
 
@@ -443,12 +434,13 @@ function App() {
                     <button
                       onClick={handleExport}
                       disabled={exporting}
-                      className={`animate-gradient relative w-full overflow-hidden rounded-lg bg-gradient-to-r from-neon-pink via-neon-purple to-neon-cyan px-6 py-3 font-disco text-base font-bold uppercase tracking-wider text-white shadow-lg transition-all duration-300 ${
+                      className={`animate-gradient relative w-full overflow-hidden rounded-lg bg-gradient-to-r from-neon-pink via-neon-purple to-neon-cyan px-6 py-3 font-disco text-base font-bold uppercase tracking-wider text-white shadow-lg transition-all duration-300 inline-flex items-center justify-center gap-2 ${
                         exporting
                           ? 'cursor-not-allowed opacity-50'
                           : 'cursor-pointer hover:scale-[1.02] hover:shadow-neon-pink/30'
                       }`}
                     >
+                      <Icon icon={exporting ? 'tabler:loader-2' : 'tabler:download'} className={`w-5 h-5 ${exporting ? 'animate-spin' : ''}`} />
                       <span className="relative z-10">
                         {exporting ? 'Generando ZIP...' : 'Exportar ZIP'}
                       </span>
