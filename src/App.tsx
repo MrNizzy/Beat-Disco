@@ -14,7 +14,7 @@ import BeatPulse from './components/BeatPulse'
 import SongWaveform from './components/SongWaveform'
 import SongEditorModal from './components/SongEditorModal'
 import type { EditorSnapshot } from './components/SongEditorModal'
-import ElectricBorder from './components/ElectricBorder'
+import BorderGlow from './components/BorderGlow'
 import LiquidEther from './components/LiquidEther'
 import { useVolumeStore } from './lib/store/useVolumeStore'
 
@@ -264,7 +264,16 @@ function App() {
         ) : (
           <section className="flex flex-col gap-4">
             <div className="flex justify-center">
-              <ElectricBorder color="#00f0ff" chaos={0.08}>
+              <BorderGlow
+                colors={['#00f0ff', '#ff2d95', '#b300ff']}
+                glowColor="190 100 50"
+                backgroundColor="#050505"
+                borderRadius={0}
+                edgeSensitivity={30}
+                animated={true}
+                glowIntensity={1.0}
+                fillOpacity={0.5}
+              >
                 <button
                   onClick={handleNewSong}
                   className="cursor-pointer inline-flex items-center gap-1.5  border border-white/5 bg-black/40 px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-text-secondary transition-all hover:border-neon-cyan/30 hover:text-neon-cyan"
@@ -272,7 +281,7 @@ function App() {
                   <Icon icon="tabler:music-plus" className="w-5 h-5" />
                   Nueva canción
                 </button>
-              </ElectricBorder>
+              </BorderGlow>
             </div>
 
             {error && (
@@ -375,7 +384,16 @@ function App() {
                         </p>
                       </div>
 
-                      <ElectricBorder color="#ff2d95">
+                      <BorderGlow
+                        colors={['#ff2d95', '#00f0ff', '#b300ff']}
+                        glowColor="330 100 60"
+                        backgroundColor="#050505"
+                        borderRadius={0}
+                        edgeSensitivity={30}
+                        animated={true}
+                        glowIntensity={1.0}
+                        fillOpacity={0.5}
+                      >
                         <button
                           onClick={() => player.playing ? player.stop() : player.play()}
                           className="btn-primary w-full  px-10 py-4 text-lg font-bold uppercase tracking-wider"
@@ -383,7 +401,7 @@ function App() {
                           <Icon icon={player.playing ? 'tabler:player-stop-filled' : 'tabler:player-play-filled'} className="w-6 h-6" />
                           {player.playing ? 'Detener' : 'Reproducir'}
                         </button>
-                      </ElectricBorder>
+                      </BorderGlow>
 
                       <div className="grid grid-cols-[1.5rem_1fr_90px] gap-x-2.5 gap-y-3 items-center">
                         <Icon icon="tabler:volume" className="w-5 h-5 text-text-muted justify-self-center" />
@@ -439,7 +457,16 @@ function App() {
                           <Icon icon="tabler:edit" className="w-5 h-5" />
                           Editar
                         </button>
-                        <ElectricBorder color="#00f0ff" chaos={0.08}>
+                        <BorderGlow
+                          colors={['#ff2d95', '#00f0ff', '#b300ff']}
+                          glowColor="190 100 50"
+                          backgroundColor="#050505"
+                          borderRadius={0}
+                          edgeSensitivity={30}
+                          animated={true}
+                          glowIntensity={1.0}
+                          fillOpacity={0.5}
+                        >
                           <button
                             onClick={handleExport}
                             disabled={exporting}
@@ -452,7 +479,7 @@ function App() {
                             {exporting ? 'Generando ZIP...' : 'Exportar ZIP'}
                           </span>
                         </button>
-                        </ElectricBorder>
+                        </BorderGlow>
                       </div>
                     </aside>
                   </div>

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Icon } from '@iconify/react'
 import type { BpmOption } from '../song/config/types'
-import ElectricBorder from './ElectricBorder'
+import BorderGlow from './BorderGlow'
 
 export interface EditorSnapshot {
   bpm: number
@@ -413,14 +413,23 @@ export default function SongEditorModal({
         </div>
 
         <div className="mb-5 space-y-3">
-          <ElectricBorder color="#ff2d95">
+          <BorderGlow
+            colors={['#ff2d95', '#00f0ff', '#b300ff']}
+            glowColor="330 100 60"
+            backgroundColor="#050505"
+            borderRadius={0}
+            edgeSensitivity={30}
+            animated={true}
+            glowIntensity={1.0}
+            fillOpacity={0.5}
+          >
             <button
               onClick={() => (playing ? onStop() : onPlay())}
               className="btn-primary w-full px-8 py-3 text-lg font-bold uppercase tracking-wider"
             >
               <Icon icon={playing ? 'tabler:player-stop-filled' : 'tabler:player-play-filled'} className="w-6 h-6" />
             </button>
-          </ElectricBorder>
+          </BorderGlow>
 
           <div className="grid grid-cols-[1.5rem_1fr_90px] sm:grid-cols-[1.5rem_1fr_90px_1.5rem_1fr_90px] gap-x-2.5 gap-y-3 sm:gap-y-0 items-center">
             <Icon icon="tabler:volume" className="w-5 h-5 text-text-muted justify-self-center" />
@@ -470,7 +479,16 @@ export default function SongEditorModal({
         </div>
 
         <div className="flex items-center justify-between border-t border-white/5 pt-4">
-          <ElectricBorder color="#00f0ff" chaos={0.08}>
+          <BorderGlow
+            colors={['#00f0ff', '#ff2d95', '#b300ff']}
+            glowColor="190 100 50"
+            backgroundColor="#050505"
+            borderRadius={0}
+            edgeSensitivity={30}
+            animated={true}
+            glowIntensity={1.0}
+            fillOpacity={0.5}
+          >
             <button
               onClick={handleReset}
               className="cursor-pointer flex items-center gap-1.5  border border-white/10 bg-black/40 px-6 py-3 text-base font-bold uppercase tracking-wider text-text-muted transition-all hover:border-neon-cyan/30 hover:text-neon-cyan"
@@ -478,8 +496,17 @@ export default function SongEditorModal({
               <Icon icon="tabler:refresh" className="w-5 h-5" />
               Reset
             </button>
-          </ElectricBorder>
-          <ElectricBorder color="#ff2d95">
+          </BorderGlow>
+          <BorderGlow
+            colors={['#ff2d95', '#00f0ff', '#b300ff']}
+            glowColor="330 100 60"
+            backgroundColor="#050505"
+            borderRadius={0}
+            edgeSensitivity={30}
+            animated={true}
+            glowIntensity={1.0}
+            fillOpacity={0.5}
+          >
             <button
               onClick={handleDone}
               className="btn-primary  px-8 py-3 text-base font-bold uppercase tracking-wider"
@@ -487,7 +514,7 @@ export default function SongEditorModal({
               <Icon icon="tabler:check" className="w-6 h-6" />
               Done
             </button>
-          </ElectricBorder>
+          </BorderGlow>
         </div>
       </div>
     </div>
