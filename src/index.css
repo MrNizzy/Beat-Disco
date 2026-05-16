@@ -1,2 +1,64 @@
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: #fff; color: #222; }
+@import "tailwindcss";
+
+@theme {
+  --color-surface: #111122;
+  --color-surface-hover: #1a1a30;
+  --color-surface-active: #222244;
+  --color-neon-pink: #ff2d95;
+  --color-neon-cyan: #00f0ff;
+  --color-neon-purple: #8b5cf6;
+  --color-neon-gold: #ffd700;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #8888aa;
+  --color-text-muted: #555577;
+  --font-disco: "Russo One", sans-serif;
+  --font-body: "Inter", sans-serif;
+}
+
+body {
+  background-color: #050505;
+  background-image:
+    linear-gradient(rgba(255, 45, 149, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 45, 149, 0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  font-family: var(--font-body);
+  color: var(--color-text-primary);
+  min-height: 100vh;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out forwards;
+}
+
+.neon-glow-pink {
+  box-shadow:
+    0 0 10px var(--color-neon-pink),
+    0 0 30px color-mix(in srgb, var(--color-neon-pink) 30%, transparent);
+}
+
+.neon-text {
+  text-shadow:
+    0 0 20px var(--color-neon-pink),
+    0 0 50px color-mix(in srgb, var(--color-neon-pink) 40%, transparent);
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255, 45, 149, 0.3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-neon-pink); }

@@ -4,7 +4,7 @@ import './index.css'
 import App from './App.tsx'
 
 import { Buffer } from 'buffer'
-; (window as any).Buffer = Buffer
+;(window as any).Buffer = Buffer
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
