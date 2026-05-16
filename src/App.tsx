@@ -15,6 +15,7 @@ import SongWaveform from './components/SongWaveform'
 import SongEditorModal from './components/SongEditorModal'
 import type { EditorSnapshot } from './components/SongEditorModal'
 import ElectricBorder from './components/ElectricBorder'
+import LiquidEther from './components/LiquidEther'
 import { useVolumeStore } from './lib/store/useVolumeStore'
 
 function App() {
@@ -195,16 +196,17 @@ function App() {
       <ParticlesBackground playing={player.playing} beatPhaseRef={player.beatPhaseRef} metronomeEnabled={player.metronomeEnabled} />
       <EdgeWaves analyserRef={player.analyserRef} playing={player.playing} />
       <BeatPulse beatPhaseRef={player.beatPhaseRef} playing={player.playing} />
-      <div
-        className="fixed inset-0 z-[-1] pointer-events-none select-none"
-        style={{
-          backgroundImage: 'url(/charlie)',
-          backgroundPosition: 'left bottom',
-          backgroundSize: 'auto 80%',
-          backgroundRepeat: 'no-repeat',
-        }}
-        aria-hidden="true"
-      />
+      <div className="fixed inset-0 z-[-1] pointer-events-none" aria-hidden="true">
+        <LiquidEther
+          colors={['#ff2d95', '#00f0ff', '#b300ff']}
+          mouseForce={20}
+          cursorSize={100}
+          resolution={0.5}
+          autoDemo={true}
+          autoSpeed={0.5}
+          autoIntensity={2.2}
+        />
+      </div>
 
       {dragOver && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
