@@ -20,7 +20,7 @@ export default function SongMetadataForm({ title, artist, onChangeTitle, onChang
             type="text"
             value={title}
             onChange={(e) => onChangeTitle(e.target.value)}
-            className="w-full  border border-white/5 bg-black px-5 py-3.5 text-lg text-text-primary outline-none transition-all focus:border-neon-pink/50 focus:ring-1 focus:ring-neon-pink/30"
+            className="cursor-target w-full  border border-white/5 bg-black px-5 py-3.5 text-lg text-text-primary outline-none transition-all focus:border-neon-pink/50 focus:ring-1 focus:ring-neon-pink/30"
           />
         </div>
         <div className="flex-1 text-left">
@@ -31,7 +31,7 @@ export default function SongMetadataForm({ title, artist, onChangeTitle, onChang
             type="text"
             value={artist}
             onChange={(e) => onChangeArtist(e.target.value)}
-            className="w-full  border border-white/5 bg-black px-5 py-3.5 text-lg text-text-primary outline-none transition-all focus:border-neon-pink/50 focus:ring-1 focus:ring-neon-pink/30"
+            className="cursor-target w-full  border border-white/5 bg-black px-5 py-3.5 text-lg text-text-primary outline-none transition-all focus:border-neon-pink/50 focus:ring-1 focus:ring-neon-pink/30"
           />
         </div>
       </div>

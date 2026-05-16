@@ -277,7 +277,7 @@ export default function SongEditorModal({
         <div className="relative p-8">
           <button
             onClick={handleClose}
-            className="absolute right-0 top-0 cursor-pointer text-text-muted transition-colors hover:text-white"
+            className="cursor-target absolute right-0 top-0 cursor-pointer text-text-muted transition-colors hover:text-white"
             aria-label="Cerrar"
           >
             <Icon icon="tabler:x" className="w-6 h-6" />
@@ -290,7 +290,7 @@ export default function SongEditorModal({
               type="text"
               value={localTitle}
               onChange={(e) => setLocalTitle(e.target.value)}
-              className="w-full  border border-white/5 bg-black/60 px-5 py-3 text-lg text-text-primary outline-none transition-all focus:border-neon-cyan/50 focus:ring-1 focus:ring-neon-cyan/30"
+              className="cursor-target w-full  border border-white/5 bg-black/60 px-5 py-3 text-lg text-text-primary outline-none transition-all focus:border-neon-cyan/50 focus:ring-1 focus:ring-neon-cyan/30"
             />
           </div>
           <div className="flex-1">
@@ -299,7 +299,7 @@ export default function SongEditorModal({
               type="text"
               value={localArtist}
               onChange={(e) => setLocalArtist(e.target.value)}
-              className="w-full  border border-white/5 bg-black/60 px-5 py-3 text-lg text-text-primary outline-none transition-all focus:border-neon-cyan/50 focus:ring-1 focus:ring-neon-cyan/30"
+              className="cursor-target w-full  border border-white/5 bg-black/60 px-5 py-3 text-lg text-text-primary outline-none transition-all focus:border-neon-cyan/50 focus:ring-1 focus:ring-neon-cyan/30"
             />
           </div>
         </div>
@@ -360,7 +360,7 @@ export default function SongEditorModal({
                 const v = Math.max(0, Math.min(Number(e.target.value), localTrimEnd - minTrimGap))
                 setLocalTrimStart(v)
               }}
-              className="w-full  border border-white/5 bg-black/60 px-5 py-3 text-lg text-text-primary outline-none transition-all focus:border-neon-pink/50 focus:ring-1 focus:ring-neon-pink/30"
+              className="cursor-target w-full  border border-white/5 bg-black/60 px-5 py-3 text-lg text-text-primary outline-none transition-all focus:border-neon-pink/50 focus:ring-1 focus:ring-neon-pink/30"
             />
           </div>
           <div className="flex-1">
@@ -372,7 +372,7 @@ export default function SongEditorModal({
                 const v = Math.min(durationMs, Math.max(Number(e.target.value), localTrimStart + minTrimGap))
                 setLocalTrimEnd(v)
               }}
-              className="w-full  border border-white/5 bg-black/60 px-5 py-3 text-lg text-text-primary outline-none transition-all focus:border-neon-cyan/50 focus:ring-1 focus:ring-neon-cyan/30"
+              className="cursor-target w-full  border border-white/5 bg-black/60 px-5 py-3 text-lg text-text-primary outline-none transition-all focus:border-neon-cyan/50 focus:ring-1 focus:ring-neon-cyan/30"
             />
           </div>
         </div>
@@ -387,7 +387,7 @@ export default function SongEditorModal({
               value={bpmInputValue}
               onChange={(e) => setBpmInputValue(e.target.value)}
               onBlur={handleBpmInputBlur}
-              className="w-[120px]  border border-white/5 bg-black/60 px-4 py-2.5 text-lg font-bold text-text-primary outline-none transition-all focus:border-neon-cyan/50 focus:ring-1 focus:ring-neon-cyan/30"
+              className="cursor-target w-[120px]  border border-white/5 bg-black/60 px-4 py-2.5 text-lg font-bold text-text-primary outline-none transition-all focus:border-neon-cyan/50 focus:ring-1 focus:ring-neon-cyan/30"
             />
             {snapshot.bpmOptions.map((opt) => {
               const selected = localBpm === opt.bpm
@@ -399,7 +399,7 @@ export default function SongEditorModal({
                     setLocalBpm(opt.bpm)
                     setBpmInputValue(String(opt.bpm))
                   }}
-                className={`cursor-pointer  border px-5 py-2.5 font-body text-lg font-bold transition-all ${
+                className={`cursor-target cursor-pointer  border px-5 py-2.5 font-body text-lg font-bold transition-all ${
                   selected
                     ? 'border-neon-pink/60 bg-neon-pink/15 text-neon-pink neon-glow-pink'
                     : 'border-white/5 bg-black/40 text-text-secondary hover:border-neon-pink/30 hover:text-text-primary'
@@ -419,14 +419,14 @@ export default function SongEditorModal({
             type="number"
             value={localOffset}
             onChange={(e) => setLocalOffset(Number(e.target.value))}
-            className="w-full max-w-[240px]  border border-white/5 bg-black/60 px-5 py-3 text-lg text-text-primary outline-none transition-all focus:border-neon-cyan/50 focus:ring-1 focus:ring-neon-cyan/30"
+            className="cursor-target w-full max-w-[240px]  border border-white/5 bg-black/60 px-5 py-3 text-lg text-text-primary outline-none transition-all focus:border-neon-cyan/50 focus:ring-1 focus:ring-neon-cyan/30"
           />
         </div>
 
         <div className="mb-5 space-y-3">
           <button
             onClick={() => (playing ? onStop() : onPlay())}
-            className="btn-primary w-full px-8 py-3 text-lg font-bold uppercase tracking-wider"
+            className="cursor-target btn-primary w-full px-8 py-3 text-lg font-bold uppercase tracking-wider"
           >
             <Icon icon={playing ? 'tabler:player-stop-filled' : 'tabler:player-play-filled'} className="w-6 h-6" />
           </button>
@@ -440,11 +440,11 @@ export default function SongEditorModal({
               step={0.05}
               value={volume}
               onChange={(e) => onVolumeChange(Number(e.target.value))}
-              className="range-neon w-full"
+              className="cursor-target range-neon w-full"
             />
             <button
               onClick={onMetronomeToggle}
-              className={`cursor-pointer flex items-center gap-1.5 border px-4 py-2.5 text-sm font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-200 justify-center ${
+              className={`cursor-target cursor-pointer flex items-center gap-1.5 border px-4 py-2.5 text-sm font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-200 justify-center ${
                 metronomeEnabled
                   ? 'border-neon-cyan/50 bg-neon-cyan/12 text-neon-cyan hover:bg-neon-cyan/20'
                   : 'border-white/10 bg-white/5 text-text-muted hover:border-text-muted/30'
@@ -462,11 +462,11 @@ export default function SongEditorModal({
               step={0.05}
               value={metronomeVolume}
               onChange={(e) => onMetronomeVolumeChange(Number(e.target.value))}
-              className="range-neon w-full"
+              className="cursor-target range-neon w-full"
             />
             <button
               onClick={onMuteToggle}
-              className={`cursor-pointer flex items-center gap-1.5 border px-4 py-2.5 text-sm font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-200 justify-center ${
+              className={`cursor-target cursor-pointer flex items-center gap-1.5 border px-4 py-2.5 text-sm font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-200 justify-center ${
                 !muted
                   ? 'border-neon-cyan/50 bg-neon-cyan/12 text-neon-cyan hover:bg-neon-cyan/20'
                   : 'border-white/10 bg-white/5 text-text-muted hover:border-text-muted/30'
@@ -481,14 +481,14 @@ export default function SongEditorModal({
         <div className="flex items-center justify-between border-t border-white/5 pt-4">
           <button
             onClick={handleReset}
-            className="cursor-pointer flex items-center gap-1.5  border border-white/10 bg-black/40 px-6 py-3 text-base font-bold uppercase tracking-wider text-text-muted transition-all hover:border-neon-cyan/30 hover:text-neon-cyan"
+            className="cursor-target cursor-pointer flex items-center gap-1.5  border border-white/10 bg-black/40 px-6 py-3 text-base font-bold uppercase tracking-wider text-text-muted transition-all hover:border-neon-cyan/30 hover:text-neon-cyan"
           >
             <Icon icon="tabler:refresh" className="w-5 h-5" />
             Reset
           </button>
           <button
             onClick={handleDone}
-            className="btn-primary  px-8 py-3 text-base font-bold uppercase tracking-wider"
+            className="cursor-target btn-primary  px-8 py-3 text-base font-bold uppercase tracking-wider"
           >
             <Icon icon="tabler:check" className="w-6 h-6" />
             Done

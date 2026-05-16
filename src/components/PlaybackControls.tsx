@@ -29,7 +29,7 @@ export default function PlaybackControls({
     <div className="flex flex-col gap-4">
       <button
         onClick={onTogglePlay}
-        className="btn-primary w-full px-10 py-4 text-lg font-bold uppercase tracking-wider"
+        className="cursor-target btn-primary w-full px-10 py-4 text-lg font-bold uppercase tracking-wider"
       >
         <Icon icon={playing ? 'tabler:player-stop-filled' : 'tabler:player-play-filled'} className="w-6 h-6" />
         {playing ? 'Detener' : 'Reproducir'}
@@ -44,11 +44,11 @@ export default function PlaybackControls({
           step={0.05}
           value={volume}
           onChange={(e) => onVolumeChange(Number(e.target.value))}
-          className="range-neon w-full"
+          className="cursor-target range-neon w-full"
         />
         <button
           onClick={onMuteToggle}
-          className={`cursor-pointer flex items-center gap-1.5 border px-4 py-2.5 text-sm font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-200 justify-center ${
+          className={`cursor-target cursor-pointer flex items-center gap-1.5 border px-4 py-2.5 text-sm font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-200 justify-center ${
             !muted
               ? 'border-neon-cyan/50 bg-neon-cyan/12 text-neon-cyan hover:bg-neon-cyan/20'
               : 'border-white/10 bg-white/5 text-text-muted hover:border-text-muted/30'
@@ -66,11 +66,11 @@ export default function PlaybackControls({
           step={0.05}
           value={metronomeVolume}
           onChange={(e) => onMetronomeVolumeChange(Number(e.target.value))}
-          className="range-neon w-full"
+          className="cursor-target range-neon w-full"
         />
         <button
           onClick={onMetronomeToggle}
-          className={`cursor-pointer flex items-center gap-1.5 border px-4 py-2.5 text-sm font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-200 justify-center ${
+          className={`cursor-target cursor-pointer flex items-center gap-1.5 border px-4 py-2.5 text-sm font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-200 justify-center ${
             metronomeEnabled
               ? 'border-neon-cyan/50 bg-neon-cyan/12 text-neon-cyan hover:bg-neon-cyan/20'
               : 'border-white/10 bg-white/5 text-text-muted hover:border-text-muted/30'

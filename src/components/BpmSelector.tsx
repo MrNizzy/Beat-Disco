@@ -30,7 +30,7 @@ export default function BpmSelector({ bpmOptions, selectedBpm, onSelect }: Props
               key={opt.bpm}
               type="button"
               onClick={() => onSelect(opt.bpm)}
-              className={`cursor-pointer border px-4 py-2 font-body text-lg font-bold transition-all ${pillStyle(opt, selected)}`}
+              className={`cursor-target cursor-pointer border px-4 py-2 font-body text-lg font-bold transition-all ${pillStyle(opt, selected)}`}
             >
               <span>{opt.bpm}</span>
               <span className="ml-1.5 text-xs font-normal opacity-70">{opt.label}</span>

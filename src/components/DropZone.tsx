@@ -10,7 +10,7 @@ export default function DropZone({ loading, onClick }: Props) {
     <section className="flex items-center justify-center min-h-[55vh] sm:min-h-[60vh]">
       <div
         onClick={onClick}
-        className="group w-full cursor-pointer  border-2 border-dashed border-neon-pink/30 bg-surface/60 p-12 text-center backdrop-blur-sm transition-all duration-300 hover:border-neon-pink/70 hover:bg-surface hover:neon-glow-pink sm:p-16"
+        className="cursor-target group w-full cursor-pointer  border-2 border-dashed border-neon-pink/30 bg-surface/60 p-12 text-center backdrop-blur-sm transition-all duration-300 hover:border-neon-pink/70 hover:bg-surface hover:neon-glow-pink sm:p-16"
       >
         <div className="mb-4 flex justify-center text-neon-pink/50 transition-colors group-hover:text-neon-pink/80">
           <Icon icon="tabler:music" className="w-14 h-14 sm:w-16 sm:h-16" />

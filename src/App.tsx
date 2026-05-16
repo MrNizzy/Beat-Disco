@@ -18,6 +18,7 @@ import ActionButtons from './components/ActionButtons'
 import SongEditorModal from './components/SongEditorModal'
 import type { EditorSnapshot } from './components/SongEditorModal'
 import BorderGlow from './components/BorderGlow'
+import TargetCursor from './components/TargetCursor'
 import { useVolumeStore } from './lib/store/useVolumeStore'
 
 function App() {
@@ -218,7 +219,7 @@ function App() {
 
       <main className="relative z-10 mx-auto max-w-[90dvw] px-4 py-8 sm:px-6 sm:py-12">
         <header className={`text-center ${audioFile ? 'mb-8' : ''}`}>
-          <h1 onClick={goHome} className="font-disco text-5xl font-bold uppercase tracking-wider text-white sm:text-7xl neon-text cursor-pointer select-none" style={{ fontFamily: 'XXIX, sans-serif' }}>
+          <h1 onClick={goHome} className="cursor-target font-disco text-5xl font-bold uppercase tracking-wider text-white sm:text-7xl neon-text cursor-pointer select-none" style={{ fontFamily: 'XXIX, sans-serif' }}>
             Beat Disco
           </h1>
           <p className="mt-2 text-base text-neon-cyan sm:text-lg">
@@ -288,7 +289,7 @@ function App() {
                           setEditableOffset(Number(e.target.value))
                           if (player.playing) player.stop()
                         }}
-                        className="w-full  border border-white/5 bg-black px-5 py-3.5 text-lg text-text-primary outline-none transition-all focus:border-neon-cyan/50 focus:ring-1 focus:ring-neon-cyan/30"
+                        className="cursor-target w-full  border border-white/5 bg-black px-5 py-3.5 text-lg text-text-primary outline-none transition-all focus:border-neon-cyan/50 focus:ring-1 focus:ring-neon-cyan/30"
                       />
                       <p className="mt-1 text-sm text-text-muted">
                         El offset no cambia entre opciones de BPM
@@ -362,6 +363,8 @@ function App() {
           <p>Hecho para Dead As Disco</p>
         </footer>
       </main>
+
+      <TargetCursor />
     </div>
   )
 }
