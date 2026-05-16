@@ -22,7 +22,8 @@
 		"music-metadata-browser": "^2.5.11",
 		"react": "^19.2.6",
 		"react-dom": "^19.2.6",
-		"tailwindcss": "^4.3.0"
+		"tailwindcss": "^4.3.0",
+		"zustand": "^5.0.13"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
