@@ -52,7 +52,8 @@ function App() {
     try {
       const title = editableTitle || audioFile.title || audioFile.fileName.replace(/\.[^.]+$/, '')
       const artist = editableArtist
-      const folderName = artist ? `${title} - ${artist}` : title
+      const sanitize = (s: string) => s.replace(/[\\/:*?"<>|]/g, '_')
+      const folderName = artist ? `${sanitize(title)} - ${sanitize(artist)}` : sanitize(title)
       const songName = title
 
       const result = await exportSong(
