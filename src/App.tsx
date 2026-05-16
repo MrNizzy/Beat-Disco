@@ -196,6 +196,16 @@ function App() {
       <ParticlesBackground playing={player.playing} beatPhaseRef={player.beatPhaseRef} metronomeEnabled={player.metronomeEnabled} />
       <EdgeWaves analyserRef={player.analyserRef} playing={player.playing} />
       <BeatPulse beatPhaseRef={player.beatPhaseRef} playing={player.playing} />
+      <div
+        className="fixed inset-0 z-[-2] pointer-events-none select-none"
+        style={{
+          backgroundImage: 'url(/charlie)',
+          backgroundPosition: 'left bottom',
+          backgroundSize: 'auto 80%',
+          backgroundRepeat: 'no-repeat',
+        }}
+        aria-hidden="true"
+      />
       <div className="fixed inset-0 z-[-1] pointer-events-none" aria-hidden="true">
         <LiquidEther
           colors={['#ff2d95', '#00f0ff', '#b300ff']}
@@ -264,24 +274,13 @@ function App() {
         ) : (
           <section className="flex flex-col gap-4">
             <div className="flex justify-center">
-              <BorderGlow
-                colors={['#00f0ff', '#ff2d95', '#b300ff']}
-                glowColor="190 100 50"
-                backgroundColor="#050505"
-                borderRadius={0}
-                edgeSensitivity={30}
-                animated={true}
-                glowIntensity={1.0}
-                fillOpacity={0.5}
+              <button
+                onClick={handleNewSong}
+                className="cursor-pointer inline-flex items-center gap-1.5  border border-white/5 bg-black/40 px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-text-secondary transition-all hover:border-neon-cyan/30 hover:text-neon-cyan"
               >
-                <button
-                  onClick={handleNewSong}
-                  className="cursor-pointer inline-flex items-center gap-1.5  border border-white/5 bg-black/40 px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-text-secondary transition-all hover:border-neon-cyan/30 hover:text-neon-cyan"
-                >
-                  <Icon icon="tabler:music-plus" className="w-5 h-5" />
-                  Nueva canción
-                </button>
-              </BorderGlow>
+                <Icon icon="tabler:music-plus" className="w-5 h-5" />
+                Nueva canción
+              </button>
             </div>
 
             {error && (
@@ -291,8 +290,17 @@ function App() {
             )}
 
             {analysis && audioFile && (
-              <article className="animate-fade-in  border border-white/5 bg-surface/80 backdrop-blur-sm overflow-hidden">
-                <div className="h-[3px] bg-gradient-to-r from-neon-pink via-neon-purple to-neon-cyan" />
+              <BorderGlow
+                colors={['#ff2d95', '#00f0ff', '#b300ff']}
+                glowColor="330 100 60"
+                backgroundColor="rgba(17,17,34,0.9)"
+                borderRadius={0}
+                edgeSensitivity={30}
+                animated={true}
+                glowIntensity={1.0}
+                fillOpacity={0.5}
+              >
+              <article className="animate-fade-in overflow-hidden">
                 <div className="p-8 sm:p-10 space-y-6">
                   <div>
                     <div className="flex gap-3">
@@ -384,24 +392,13 @@ function App() {
                         </p>
                       </div>
 
-                      <BorderGlow
-                        colors={['#ff2d95', '#00f0ff', '#b300ff']}
-                        glowColor="330 100 60"
-                        backgroundColor="#050505"
-                        borderRadius={0}
-                        edgeSensitivity={30}
-                        animated={true}
-                        glowIntensity={1.0}
-                        fillOpacity={0.5}
+                      <button
+                        onClick={() => player.playing ? player.stop() : player.play()}
+                        className="btn-primary w-full  px-10 py-4 text-lg font-bold uppercase tracking-wider"
                       >
-                        <button
-                          onClick={() => player.playing ? player.stop() : player.play()}
-                          className="btn-primary w-full  px-10 py-4 text-lg font-bold uppercase tracking-wider"
-                        >
-                          <Icon icon={player.playing ? 'tabler:player-stop-filled' : 'tabler:player-play-filled'} className="w-6 h-6" />
-                          {player.playing ? 'Detener' : 'Reproducir'}
-                        </button>
-                      </BorderGlow>
+                        <Icon icon={player.playing ? 'tabler:player-stop-filled' : 'tabler:player-play-filled'} className="w-6 h-6" />
+                        {player.playing ? 'Detener' : 'Reproducir'}
+                      </button>
 
                       <div className="grid grid-cols-[1.5rem_1fr_90px] gap-x-2.5 gap-y-3 items-center">
                         <Icon icon="tabler:volume" className="w-5 h-5 text-text-muted justify-self-center" />
@@ -415,15 +412,15 @@ function App() {
                           className="range-neon w-full"
                         />
                         <button
-                          onClick={() => player.setMetronomeEnabled(!player.metronomeEnabled)}
+                          onClick={() => setMuted(!muted)}
                           className={`cursor-pointer flex items-center gap-1.5 border px-4 py-2.5 text-sm font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-200 justify-center ${
-                            player.metronomeEnabled
+                            !muted
                               ? 'border-neon-cyan/50 bg-neon-cyan/12 text-neon-cyan hover:bg-neon-cyan/20'
                               : 'border-white/10 bg-white/5 text-text-muted hover:border-text-muted/30'
                           }`}
                         >
-                          <Icon icon={player.metronomeEnabled ? 'tabler:speakerphone' : 'tabler:headphones-off'} className="w-5 h-5" />
-                          Beat
+                          <Icon icon={muted ? 'tabler:music-off' : 'tabler:music'} className="w-5 h-5" />
+                          Song
                         </button>
 
                         <Icon icon="tabler:wave-sine" className="w-5 h-5 text-text-muted justify-self-center" />
@@ -437,15 +434,15 @@ function App() {
                           className="range-neon w-full"
                         />
                         <button
-                          onClick={() => setMuted(!muted)}
+                          onClick={() => player.setMetronomeEnabled(!player.metronomeEnabled)}
                           className={`cursor-pointer flex items-center gap-1.5 border px-4 py-2.5 text-sm font-bold uppercase tracking-wider whitespace-nowrap transition-all duration-200 justify-center ${
-                            !muted
+                            player.metronomeEnabled
                               ? 'border-neon-cyan/50 bg-neon-cyan/12 text-neon-cyan hover:bg-neon-cyan/20'
                               : 'border-white/10 bg-white/5 text-text-muted hover:border-text-muted/30'
                           }`}
                         >
-                          <Icon icon={muted ? 'tabler:music-off' : 'tabler:music'} className="w-5 h-5" />
-                          Song
+                          <Icon icon={player.metronomeEnabled ? 'tabler:speakerphone' : 'tabler:headphones-off'} className="w-5 h-5" />
+                          Beat
                         </button>
                       </div>
 
@@ -457,34 +454,24 @@ function App() {
                           <Icon icon="tabler:edit" className="w-5 h-5" />
                           Editar
                         </button>
-                        <BorderGlow
-                          colors={['#ff2d95', '#00f0ff', '#b300ff']}
-                          glowColor="190 100 50"
-                          backgroundColor="#050505"
-                          borderRadius={0}
-                          edgeSensitivity={30}
-                          animated={true}
-                          glowIntensity={1.0}
-                          fillOpacity={0.5}
-                        >
-                          <button
-                            onClick={handleExport}
-                            disabled={exporting}
-                            className={`-rotate-1 flex-1 bg-gradient-to-r from-neon-pink via-neon-purple to-neon-cyan text-white px-10 py-3 text-base font-bold uppercase tracking-wider inline-flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 ${
-                            exporting ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
-                          }`}
-                        >
-                          <Icon icon={exporting ? 'tabler:loader-2' : 'tabler:download'} className={`w-5 h-5 ${exporting ? 'animate-spin' : ''}`} />
-                          <span>
-                            {exporting ? 'Generando ZIP...' : 'Exportar ZIP'}
-                          </span>
-                        </button>
-                        </BorderGlow>
+                        <button
+                          onClick={handleExport}
+                          disabled={exporting}
+                          className={`-rotate-1 flex-1 bg-gradient-to-r from-neon-pink via-neon-purple to-neon-cyan text-white px-10 py-3 text-base font-bold uppercase tracking-wider inline-flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 ${
+                          exporting ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
+                        }`}
+                      >
+                        <Icon icon={exporting ? 'tabler:loader-2' : 'tabler:download'} className={`w-5 h-5 ${exporting ? 'animate-spin' : ''}`} />
+                        <span>
+                          {exporting ? 'Generando ZIP...' : 'Exportar ZIP'}
+                        </span>
+                      </button>
                       </div>
                     </aside>
                   </div>
                 </div>
               </article>
+              </BorderGlow>
             )}
           </section>
         )}
