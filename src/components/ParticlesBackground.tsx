@@ -10,10 +10,22 @@ interface Particle {
   alpha: number
   life: number
   maxLife: number
+  phaseOffset: number
+  angle: number
 }
 
-export default function ParticlesBackground() {
+interface ParticlesBackgroundProps {
+  playing: boolean
+  beatPhaseRef: React.MutableRefObject<number>
+  metronomeEnabled: boolean
+}
+
+export default function ParticlesBackground({ playing, beatPhaseRef, metronomeEnabled }: ParticlesBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const playingRef = useRef(playing)
+  const metronomeRef = useRef(metronomeEnabled)
+  playingRef.current = playing
+  metronomeRef.current = metronomeEnabled
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -44,20 +56,23 @@ export default function ParticlesBackground() {
       else if (edge === 2) { x = Math.random() * w; y = h + 5 }
       else { x = -5; y = Math.random() * h }
 
-      maxLife: Math.floor(200 + Math.random() * 300)
       const maxLife = 200 + Math.random() * 300
       const angle = Math.atan2(h / 2 - y, w / 2 - x) + (Math.random() - 0.5) * 0.8
       const speed = 0.2 + Math.random() * 0.4
+
+      const sizeMul = playingRef.current ? 2 : 1
 
       particles.push({
         x, y,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
-        size: 1 + Math.random() * 2,
-        hue: Math.random() < 0.5 ? 330 : 190, // pink or cyan
+        size: (1 + Math.random() * 2) * sizeMul,
+        hue: Math.random() < 0.5 ? 330 : 190,
         alpha: 0.3 + Math.random() * 0.4,
         life: 0,
         maxLife,
+        phaseOffset: Math.random() * 0.3,
+        angle,
       })
     }
 
@@ -65,13 +80,24 @@ export default function ParticlesBackground() {
     function draw(time: number) {
       ctx!.clearRect(0, 0, canvas!.width, canvas!.height)
 
-      if (time - lastSpawn > 60) {
+      const spawnInterval = playingRef.current ? 40 : 60
+      if (time - lastSpawn > spawnInterval) {
         spawnParticle()
         lastSpawn = time
       }
 
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i]
+
+        if (playingRef.current && metronomeRef.current) {
+          const localPhase = (beatPhaseRef.current + p.phaseOffset + 1) % 1
+          if (localPhase < 0.1) {
+            const intensity = (1 - localPhase / 0.1)
+            p.vx += Math.cos(p.angle) * intensity * 0.15
+            p.vy += Math.sin(p.angle) * intensity * 0.15
+          }
+        }
+
         p.x += p.vx
         p.y += p.vy
         p.life++
@@ -84,15 +110,23 @@ export default function ParticlesBackground() {
           continue
         }
 
+        let renderSize = p.size
+        if (playingRef.current && metronomeRef.current) {
+          const localPhase = (beatPhaseRef.current + p.phaseOffset + 1) % 1
+          if (localPhase < 0.1) {
+            renderSize *= 1 + (1 - localPhase / 0.1) * 2
+          }
+        }
+
         ctx!.beginPath()
-        ctx!.arc(p.x, p.y, p.size, 0, Math.PI * 2)
+        ctx!.arc(p.x, p.y, renderSize, 0, Math.PI * 2)
         ctx!.fillStyle = `hsla(${p.hue}, 80%, 60%, ${alpha})`
         ctx!.fill()
 
-        // glow
-        if (p.size > 1.5) {
+        const glowMul = playingRef.current ? 4 : 3
+        if (renderSize > 1.5) {
           ctx!.beginPath()
-          ctx!.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2)
+          ctx!.arc(p.x, p.y, renderSize * glowMul, 0, Math.PI * 2)
           ctx!.fillStyle = `hsla(${p.hue}, 80%, 60%, ${alpha * 0.15})`
           ctx!.fill()
         }
