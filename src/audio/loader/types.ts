@@ -5,4 +5,6 @@ export interface AudioFile {
   duration: number
   sampleRate: number
   fileName: string
+  title: string
+  artist: string
 }

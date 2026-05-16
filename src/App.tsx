@@ -2,14 +2,18 @@ import { useRef, useState } from 'react'
 import { loadAudioFile } from './audio/loader/index'
 import { analyseAudio } from './audio/analyser/index'
 import type { AnalysisResult } from './song/config/types'
-import { exportSong, downloadExport } from './export/index'
+import type { AudioFile } from './audio/loader/types'
+import { exportSong } from './export/index'
+import JSZip from 'jszip'
+import { configToJson } from './song/config/index'
 
 function App() {
-  const [audioBuffer, setAudioBuffer] = useState<AudioBuffer | null>(null)
-  const [fileName, setFileName] = useState('')
+  const [audioFile, setAudioFile] = useState<AudioFile | null>(null)
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null)
   const [selectedBpmOption, setSelectedBpmOption] = useState(0)
   const [editableOffset, setEditableOffset] = useState(0)
+  const [editableTitle, setEditableTitle] = useState('')
+  const [editableArtist, setEditableArtist] = useState('')
   const [loading, setLoading] = useState(false)
   const [exporting, setExporting] = useState(false)
   const [error, setError] = useState('')
@@ -18,14 +22,16 @@ function App() {
   async function handleFile(file: File) {
     setError('')
     setAnalysis(null)
-    setFileName(file.name)
+    setAudioFile(null)
 
     try {
       setLoading(true)
-      const buffer = await loadAudioFile(file)
-      setAudioBuffer(buffer)
+      const af = await loadAudioFile(file)
+      setAudioFile(af)
+      setEditableTitle(af.title)
+      setEditableArtist(af.artist)
 
-      const result = analyseAudio(buffer)
+      const result = analyseAudio(af.audioBuffer)
       setAnalysis(result)
       setEditableOffset(result.beatOffset)
 
@@ -39,17 +45,33 @@ function App() {
   }
 
   async function handleExport() {
-    if (!audioBuffer) return
+    if (!audioFile) return
     setExporting(true)
     setError('')
 
     try {
-      const baseName = fileName.replace(/\.[^.]+$/, '')
+      const title = editableTitle || audioFile.title || audioFile.fileName.replace(/\.[^.]+$/, '')
+      const artist = editableArtist
+      const folderName = artist ? `${title} - ${artist}` : title
+      const songName = title
+
       const result = await exportSong(
-        audioBuffer,
-        { tempo: selectedBpmOption, beatOffset: editableOffset, songName: baseName },
+        audioFile.audioBuffer,
+        { tempo: selectedBpmOption, beatOffset: editableOffset, songName, performedBy: artist ? [artist] : [] },
       )
-      downloadExport(result, baseName)
+
+      const zip = new JSZip()
+      const folder = zip.folder(folderName)!
+      folder.file('Audio.ogg', result.oggBlob)
+      folder.file('Meta.json', configToJson(result.config))
+
+      const zipBlob = await zip.generateAsync({ type: 'blob' })
+      const url = URL.createObjectURL(zipBlob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `${folderName}.zip`
+      link.click()
+      URL.revokeObjectURL(url)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al exportar')
     } finally {
@@ -87,12 +109,33 @@ function App() {
 
       {error && <p style={{ color: '#d32f2f', marginTop: 16 }}>{error}</p>}
 
-      {analysis && (
+      {analysis && audioFile && (
         <div style={{ marginTop: 24 }}>
           <h2>Resultados</h2>
 
           <div style={{ marginTop: 12, fontSize: 14, color: '#666' }}>
-            <p>Duración: {audioBuffer?.duration.toFixed(1)}s &middot; {audioBuffer?.sampleRate}Hz &middot; {audioBuffer?.numberOfChannels} canales</p>
+            <p>Duración: {audioFile.audioBuffer.duration.toFixed(1)}s &middot; {audioFile.audioBuffer.sampleRate}Hz &middot; {audioFile.audioBuffer.numberOfChannels} canales</p>
+          </div>
+
+          <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div>
+              <label style={{ display: 'block', fontSize: 12, color: '#666', marginBottom: 4 }}>Título</label>
+              <input
+                type="text"
+                value={editableTitle}
+                onChange={(e) => setEditableTitle(e.target.value)}
+                style={{ width: '100%', padding: 8, fontSize: 14, border: '1px solid #ccc', borderRadius: 4 }}
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: 12, color: '#666', marginBottom: 4 }}>Artista</label>
+              <input
+                type="text"
+                value={editableArtist}
+                onChange={(e) => setEditableArtist(e.target.value)}
+                style={{ width: '100%', padding: 8, fontSize: 14, border: '1px solid #ccc', borderRadius: 4 }}
+              />
+            </div>
           </div>
 
           <div style={{ marginTop: 16 }}>
@@ -169,7 +212,7 @@ function App() {
               width: '100%',
             }}
           >
-            {exporting ? 'Convirtiendo...' : 'Exportar OGG + JSON'}
+            {exporting ? 'Generando ZIP...' : 'Exportar ZIP'}
           </button>
         </div>
       )}
