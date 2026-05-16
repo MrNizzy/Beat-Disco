@@ -95,7 +95,6 @@ body {
   background-color: #ffffff;
   color: #ff2d95;
   border: 0;
-  transform: rotate(-1deg);
   transition: all .2s cubic-bezier(.4,0,.2,1);
   cursor: pointer;
 }
