@@ -12,7 +12,9 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@audio/encode-ogg": "^1.0.2",
     "beat-detection": "^1.1.0",
+    "buffer": "^6.0.3",
     "jszip": "^3.10.1",
     "music-metadata-browser": "^2.5.11",
     "react": "^19.2.6",
