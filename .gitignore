@@ -42,3 +42,10 @@ GEMINI.md
 
 # SpecKit / Spec-Driven Development
 .specify/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
